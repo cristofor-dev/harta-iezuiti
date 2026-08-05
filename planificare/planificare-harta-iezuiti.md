@@ -42,6 +42,22 @@ grup) în același stil vizual (negru, cerc, cifră albă) ca badge-ul individua
 diferit de negrul badge-urilor individuale, ca cele două să nu mai poată fi confundate la
 prima vedere.
 
+**Decizie ulterioară, la cererea explicită a utilizatorului:** cerința "se văd toate 8 la
+încărcare" a fost relaxată — utilizatorul a preferat un zoom inițial mult mai mare (fix, pe
+grupul cel mai dens: locațiile 4, 5, 6, la doar 25-100m una de alta), chiar dacă asta lasă
+locațiile 1, 3 și 8 în afara cadrului inițial (rămân accesibile prin legendă sau zoom-out
+manual). Motivul: la orice zoom suficient de mic încât să încapă toate cele 8, grupul dens
+tot se suprapunea vizual — fie ca markere individuale ating despre-atinse, fie ca un cluster
+albastru care, deși nu se mai confundă cu un badge individual, tot ascundea detaliul. Zoom-ul
+fix (18, centrat pe grup) elimină problema la origine: la încărcare, locațiile din centrul
+istoric apar deja complet separate, fără nicio suprapunere sau clusterizare.
+
+**Interacțiune adăugată:** hover pe un cluster (grup) declanșează, după ~450ms de cursor
+susținut pe el (nu instant, ca să nu se activeze din greșeală doar trecând pe acolo), un
+zoom automat spre acel grup — exact ca la click, dar și la simpla trecere cu mausul. Testat
+cu Playwright: hover scurt (<450ms) sau cursor plecat înainte de prag nu schimbă zoom-ul;
+hover susținut peste prag mărește zoom-ul și desparte grupul.
+
 ## Conținut sursă
 
 Utilizatorul a furnizat un PDF cu text istoric și fotografii de arhivă. A fost convertit în

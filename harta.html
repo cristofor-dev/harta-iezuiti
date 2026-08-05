@@ -360,6 +360,23 @@
     });
   });
 
+  // La hover pe un cluster (grup), zoom automat spre el ca să se despartă în markere
+  // individuale — cu o mică întârziere, ca să nu se declanșeze doar trecând cursorul pe
+  // aproape din greșeală.
+  var clusterHoverTimer = null;
+  clusterGroup.on("clustermouseover", function (e) {
+    var cluster = e.layer;
+    clusterHoverTimer = setTimeout(function () {
+      cluster.zoomToBounds({ padding: [30, 30] });
+    }, 450);
+  });
+  clusterGroup.on("clustermouseout", function () {
+    if (clusterHoverTimer) {
+      clearTimeout(clusterHoverTimer);
+      clusterHoverTimer = null;
+    }
+  });
+
   // Legendă — click pe o locație duce harta la ea (dezgrupând clusterul dacă e nevoie) și deschide popup-ul
   var legendEl = document.getElementById("iezuiti-legend");
   locations.forEach(function (loc, i) {
@@ -378,7 +395,12 @@
     legendEl.appendChild(li);
   });
 
-  map.fitBounds(clusterGroup.getBounds(), { padding: [30, 30] });
+  // Vedere inițială: zoom fix, mare, centrat pe cel mai dens grup de locații (4, 5, 6 —
+  // la doar ~25-100m una de alta). Nu toate cele 8 locații încap la acest zoom (1 și 8 sunt
+  // la 2-3km distanță, iar 3 la ~400m) — dar la orice zoom suficient de mic ca să le includă
+  // pe toate, grupul dens s-ar suprapune din nou. 1, 3 și 8 rămân accesibile prin legendă
+  // sau prin zoom-out manual.
+  map.setView([46.76812, 23.59035], 18);
 
   window.__iezuitiHarta = { map: map, clusterGroup: clusterGroup, markers: markers };
 })();
