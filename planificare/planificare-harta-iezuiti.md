@@ -111,6 +111,63 @@ lung) să nu depășească niciodată vizual harta.
 Neutru și minimal — nu preia paleta auriu/maro/siglă IHS din PDF-ul sursă, ca să nu intre în
 conflict cu tema WordPress a site-ului țintă (necunoscută în detaliu la momentul construcției).
 
+### Revizuire de design (la cererea utilizatorului: „după reguli profesioniste de UI/UX”)
+
+**Sistem de culoare — un singur accent.** Varianta anterioară acumulase trei culori fără
+ierarhie: pini negri, grupuri albastre, hover verde. Acum: neutre calde (paleta „stone”) +
+**un** accent chihlimbariu (`#b45309`) pentru tot ce e interactiv sau activ. Chihlimbariul a
+fost ales și cartografic: verdele intra în conflict cu parcurile de pe dalele OSM, albastrul
+cu apa. _Notă: hover-ul verde fusese cerut explicit anterior; a fost înlocuit pentru
+coerență, iar schimbarea i-a fost semnalată utilizatorului._
+
+**Cronologia devine lizibilă.** Harta era „cronologică” doar prin numerotare — anii nu apărau
+nicăieri. Acum fiecare loc își arată reperul temporal (1579, 1581, 1693 … anii 2000) în
+cronologie, în popup (pastilă) și în tooltip. Lista de sub hartă e desenată ca o linie a
+timpului, cu un fir vertical care leagă numerele.
+
+**Pini vs. grupuri — limbaje vizuale diferite.** Pinul e un cerc plin, închis la culoare, cu
+vârf care indică poziția exactă. Grupul e un cerc deschis, cu contur, fără vârf, cu numărul
+plus cuvântul „locuri”. Confuzia „grup de 5” ↔ „locul 5” devine imposibilă structural, nu
+doar cromatic.
+
+**Stare activă sincronizată.** Deschiderea unui popup — din hartă sau din cronologie —
+evidențiază simultan pinul și rândul corespunzător (`aria-current`).
+
+**Alte corecții rezultate din testare:** buton „Vezi toate locurile” (vederea de ansamblu era
+altfel greu de recuperat după zoom-ul inițial); înălțimea popup-ului calculată din înălțimea
+reală a hărții, ca textul extins să nu fie tăiat; butonul de restrângere lipit jos în
+popup-ul derulabil; zoom cu rotița doar după un click pe hartă (altfel harta „fura”
+scroll-ul paginii); aducerea hărții în ecran când se alege un loc din capătul de jos al
+cronologiei; focus vizibil pe tot ce e interactiv și respectarea `prefers-reduced-motion`.
+
+### Izolarea CSS — blocul trăiește în tema altcuiva
+
+Blocul e integrat într-un WordPress necunoscut, deci a fost testat automat într-o pagină cu o
+temă deliberat ostilă (fonturi serif impuse, text centrat, `text-transform: uppercase` pe
+titluri, `button:hover { … !important }`, `ol { list-style: upper-roman }`, chenare groase pe
+`img`). Testul a scos patru defecte reale, invizibile în previzualizarea locală:
+
+1. **Dalele hărții sunt elemente `<img>`** — regula `img { border: 6px solid }` a temei
+   desena un chenar pe fiecare dală, brăzdând harta cu o grilă. Leaflet se apără singur doar
+   pentru `max-width`; restul e neutralizat explicit pe panourile Leaflet.
+2. **`button:hover { background: … !important }`** din temă câștiga: butonul devenea negru cu
+   text chihlimbariu (contrast prost). De aici `!important` țintit pe culorile stărilor
+   interactive — singurul mod de a bate `!important`-ul temei.
+3. **Leaflet impune „Helvetica Neue”** în interiorul hărții, deci popup-urile și tooltip-urile
+   ieșeau din sistemul tipografic al blocului.
+4. **`h2`/`h3`/`p` preluau** `text-transform`, fontul și `line-height` de la temă (titluri cu
+   majuscule, paragrafe cu `line-height: 2.4`).
+
+Toate au fixuri comentate în cod, plus aserțiuni în suita de test — sunt exact genul de
+defect care reapare la o „curățenie” ulterioară a CSS-ului.
+
+### Sursă unică + generator
+
+`harta.html` e sursa de adevăr; `harta-embed-wordpress.html` se generează din ea cu
+`python sync-embed.py`. Cele două fișiere erau întreținute manual în paralel și divergaseră
+deja o dată — cu ~850 de linii duplicate, sincronizarea manuală era o eroare care aștepta să
+se întâmple.
+
 ## Responsive
 
 Mobil-first: popup-uri, imagini și butoane dimensionate explicit pentru ecran de telefon

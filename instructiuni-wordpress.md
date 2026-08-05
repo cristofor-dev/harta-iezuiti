@@ -4,6 +4,10 @@
 
 - `harta.html` — pagina completă, de sine stătătoare, pentru previzualizare locală în browser (deschide-o direct sau vezi mai jos cum să o rulezi cu un mic server local).
 - `harta-embed-wordpress.html` — **acesta e cel pe care îl copiezi în WordPress** (aceeași hartă, dar fără `<!doctype>`/`<html>`/`<head>`/`<body>`, care nu au ce căuta într-un bloc de conținut).
+
+> Fișierul de WordPress e **generat automat** din `harta.html`. Dacă cineva modifică harta,
+> se editează `harta.html` și se rulează `python sync-embed.py` — nu se editează direct
+> fișierul de embed, pentru că modificarea s-ar pierde.
 - `content/Prezenta_Iezuitilor_Cluj-Napoca_1.md` — textul istoric complet, sursă pentru popup-uri.
 - `content/photo/` — cele 8 fotografii de arhivă folosite în popup-uri.
 
@@ -57,12 +61,13 @@ var PHOTO_BASE = "https://numelesitei.ro/wp-content/uploads/2026/08/";
 
 ## Pas 4 — Verificare rapidă după publicare
 
-- Markerele sunt numerotate **cronologic** (1 = cea mai veche prezență iezuită în Cluj, 1579; 8 = revenirea din anii 2000), nu în ordinea din documentul sursă.
-- Sub hartă apare o **legendă** cu toate cele 8 locații, în aceeași ordine cronologică — click/tap pe orice rând din listă duce harta direct la locația respectivă (dezgrupând clusterul dacă e nevoie) și îi deschide popup-ul automat.
-- Harta se încarcă direct pe grupul dens din centrul istoric (locațiile 4, 5, 6), suficient de mărită încât acestea să apară deja separate. Locațiile 1, 3 și 8 nu sunt vizibile inițial (sunt la 400m - 3km distanță) — se ajunge la ele fie din legendă, fie dând zoom-out manual.
-- Dacă totuși apare un cerc **albastru** cu o cifră (la zoom mic/după zoom-out), acela e un grup de mai multe locații, nu o locație individuală (locațiile individuale sunt cercuri **negre**) — un click/tap sau chiar hover susținut peste el îl desparte.
-- Click/tap pe fiecare marker deschide un popup cu titlu (cu numărul cronologic în față), poză (unde există) și un rezumat scurt.
-- Butonul „Citește mai mult” extinde textul la varianta completă.
+- Punctele sunt numerotate **cronologic** (1 = cea mai veche prezență iezuită în Cluj, 1579; 8 = revenirea din anii 2000), nu în ordinea din documentul sursă. Fiecare loc își arată și anul.
+- Sub hartă apare **cronologia** — toate cele 8 locuri, în ordine, cu anul fiecăruia. Click/tap pe orice rând duce harta la locul respectiv și îi deschide detaliile; rândul ales și punctul de pe hartă se colorează simultan, ca să vezi unde te afli.
+- Harta se încarcă direct pe grupul dens din centrul istoric (locurile 4, 5, 6), suficient de mărită încât acestea să apară deja separate. Locurile 1, 3 și 8 nu sunt vizibile inițial (sunt la 400 m – 3 km distanță) — se ajunge la ele din cronologie sau din butonul **„Vezi toate locurile”** din colțul hărții.
+- Un cerc **alb, cu contur și cuvântul „locuri”** înseamnă mai multe locuri grupate, nu un loc individual (locurile individuale sunt cercuri **pline, închise la culoare, cu vârf în jos**). Click/tap — sau doar ținerea cursorului peste el — îl desparte.
+- Click/tap pe un punct deschide detaliile: anul, titlul, poza (unde există) și un rezumat scurt; **„Citește mai mult”** extinde textul complet.
+- Pe desktop, trecerea cu mausul peste un punct îi arată denumirea și îl colorează.
+- Rotița mausului dă zoom doar după ce dai un click pe hartă — altfel derulezi pagina normal, fără ca harta să „fure” scroll-ul.
 - Testează și pe telefon — harta e gândită mobil-first.
 
 ## De reținut
