@@ -1,0 +1,379 @@
+<div id="iezuiti-harta-wrap">
+  <h2>Prezența Iezuiților în Cluj-Napoca</h2>
+  <p class="harta-intro">Opt locuri legate de istoria iezuită a orașului, numerotate cronologic (1579 – prezent). Atinge un marker sau alege un loc din listă pentru detalii.</p>
+  <div id="iezuiti-map"></div>
+  <p class="harta-legend-label">Sau alege direct din listă:</p>
+  <ol id="iezuiti-legend" class="harta-legend"></ol>
+  <p class="harta-footer">Surse foto: Fortepan.hu (CC-BY-SA 3.0) și Wikimedia Commons. Coordonatele locațiilor 6 și 7 sunt aproximative.</p>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  integrity="sha256-YU3qCpj/P06tdPBJGPax0bm6Q1wltfwjsho5TR4+TYc=" crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  integrity="sha256-YSWCMtmNZNwqex4CEw1nQhvFub2lmU7vcCKP+XVwwXA=" crossorigin="" />
+<style>
+  /* ===== Harta Iezuiților — bloc autonom, stil neutru/minimal ===== */
+  #iezuiti-harta-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #222;
+  }
+  #iezuiti-harta-wrap h2 {
+    font-size: 1.3rem;
+    margin: 0 0 0.5rem;
+  }
+  #iezuiti-harta-wrap .harta-intro {
+    font-size: 0.92rem;
+    color: #555;
+    margin: 0 0 0.75rem;
+  }
+  #iezuiti-map {
+    width: 100%;
+    height: 60vh;
+    min-height: 380px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  @media (max-width: 480px) {
+    #iezuiti-map { height: 70vh; min-height: 320px; border-radius: 4px; }
+  }
+
+  /* Markere numerotate */
+  .iezuiti-marker-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2b2b2b;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    transition: background-color 0.15s ease;
+  }
+  .iezuiti-marker-icon:hover .iezuiti-marker-badge {
+    background: #2e7d32;
+  }
+
+  /* Tooltip la hover — arată denumirea locului, ca în legendă */
+  #iezuiti-map .leaflet-tooltip {
+    font-size: 0.82rem;
+    padding: 4px 8px;
+    border-radius: 5px;
+  }
+
+  /* Popup content */
+  .leaflet-popup-content-wrapper { border-radius: 8px; }
+  .iezuiti-popup h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+  .iezuiti-popup .addr {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+  }
+  .iezuiti-popup .popup-photos {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    margin-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .iezuiti-popup .popup-photos img {
+    width: 100%;
+    max-width: 220px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .iezuiti-popup .popup-text {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin: 0 0 0.6rem;
+    white-space: pre-line;
+  }
+  .iezuiti-popup .toggle-btn {
+    display: inline-block;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+    min-height: 46px;
+    border: 1px solid #888;
+    background: #f5f5f5;
+    color: #222;
+    border-radius: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .iezuiti-popup .toggle-btn:hover { background: #ebebeb; }
+  .iezuiti-popup .no-photo-note {
+    font-size: 0.78rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Cluster icons — recolorate în tonuri neutre de gri, ca să se potrivească cu restul */
+  .marker-cluster-small { background-color: rgba(130, 130, 130, 0.5); }
+  .marker-cluster-small div { background-color: rgba(90, 90, 90, 0.8); color: #fff; }
+  .marker-cluster-medium { background-color: rgba(100, 100, 100, 0.5); }
+  .marker-cluster-medium div { background-color: rgba(70, 70, 70, 0.85); color: #fff; }
+  .marker-cluster-large { background-color: rgba(70, 70, 70, 0.5); }
+  .marker-cluster-large div { background-color: rgba(50, 50, 50, 0.9); color: #fff; }
+  .marker-cluster span { font-weight: 600; }
+
+  /* Legendă */
+  .harta-legend-label {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0.9rem 0 0.4rem;
+  }
+  .harta-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .harta-legend li + li { border-top: 1px solid #eee; }
+  .harta-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    min-height: 46px;
+    padding: 8px 12px;
+    background: #fff;
+    border: none;
+    text-align: left;
+    font-size: 0.88rem;
+    color: #222;
+    cursor: pointer;
+    touch-action: manipulation;
+    font-family: inherit;
+  }
+  .harta-legend .legend-item:hover { background: #f7f7f7; }
+  .legend-num {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2b2b2b;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .legend-title { flex: 1 1 auto; }
+
+  #iezuiti-harta-wrap .harta-footer {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.5rem;
+  }
+</style>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+  integrity="sha256-Hk4dIpcqOSb0hZjgyvFOP+cEmDXUKKNE/tT542ZbNQg=" crossorigin=""></script>
+<script>
+(function () {
+  // ATENȚIE: înlocuiește valoarea de mai jos cu URL-ul din Media Library WordPress
+  // unde ai încărcat pozele (vezi instructiuni-wordpress.md), păstrând "/" la final.
+  // Exemplu: "https://numelesitei.ro/wp-content/uploads/2026/08/"
+  var PHOTO_BASE = "content/photo/";
+
+  // Ordine cronologică (id = ordinea în timp, nu ordinea din documentul sursă / numele fișierelor foto)
+  var locations = [
+    {
+      id: 1,
+      title: "Fosta mănăstire iezuită de pe Calea Mănăștur",
+      address: "Calea Mănăștur nr. 9, Cluj-Napoca — monument istoric, clasa B",
+      lat: 46.76200, lng: 23.57027, approx: false,
+      summary: "Aici au sosit prima dată iezuiții la Cluj, în 1579, la invitația principelui Ștefan Báthory. Clădirea actuală, donată ordinului în 1626, a funcționat ca mănăstire și colegiu până în 1670; astăzi e monument istoric de clasa B.",
+      full: "Aici au sosit pentru prima dată iezuiții la Cluj, în 1579, la invitația principelui Ștefan Báthory. Clădirea de la actualul număr 9 de pe Calea Mănăștur are o istorie proprie: provine dintr-o casă medievală cumpărată în 1605 de Barbara Szentpáli, care a dăruit-o iezuiților în 1626. Alungat din oraș în 1603, ordinul revenise în zona Clujului în 1615, când a primit în posesie biserica Calvaria, aflată însă în ruină; din acest motiv, mănăstirea și colegiul iezuit au funcționat până în 1670 chiar în clădirea donată de Szentpáli. După 1670, colegiul s-a mutat în oraș, iar clădirea de pe Calea Mănăștur a continuat să funcționeze ca mănăstire, fiind reinaugurată la 3 noiembrie 1747 — dată marcată și astăzi pe bolțarul de la intrarea carosabilă. Astăzi, edificiul este monument istoric de clasa B și găzduiește o parohie.",
+      photos: [PHOTO_BASE + "04-fosta-manastire-manastur_poarta-acces.jpg"]
+    },
+    {
+      id: 2,
+      title: "Universitatea Babeș-Bolyai — clădirea centrală",
+      address: "Pe locul fostului Colegiu Iezuit, înființat în 1581",
+      lat: 46.76778, lng: 23.59198, approx: false,
+      summary: "Colegiul Iezuit din Cluj a fost fondat în 1581 de principele Ștefan Báthory — una dintre primele instituții de învățământ superior umanist din Transilvania. Clădirea centrală a UBB de astăzi continuă simbolic această tradiție universitară.",
+      full: "Colegiul Iezuit din Cluj a fost fondat în 1581, la inițiativa principelui Ștefan Báthory, ca instituție de învățământ superior umanist și teologic — una dintre primele de acest tip din Transilvania. De-a lungul a aproape două secole, colegiul a funcționat alături de biserică și de internatul propriu, formând un ansamblu educațional unitar pe actuala stradă a Universității. Clădirea centrală a Universității Babeș-Bolyai de astăzi continuă, simbolic și funcțional, această tradiție universitară inaugurată de iezuiți, fiind ridicată pe terenul și în vecinătatea fostului complex colegial.",
+      photos: [PHOTO_BASE + "02-universitatea-babes-bolyai_fortepan-29760-1910.jpg"]
+    },
+    {
+      id: 3,
+      title: "Biserica Franciscanilor (folosită temporar de iezuiți)",
+      address: "Piața Muzeului, Cluj-Napoca",
+      lat: 46.77194, lng: 23.58799, approx: false,
+      summary: "În 1693 biserica franciscanilor din Piața Muzeului a fost pusă la dispoziția iezuiților, care au înființat aici o școală temporară — folosită până în 1725, când s-au mutat în propriul complex.",
+      full: "În 1693, odată cu instaurarea dominației habsburgice asupra Transilvaniei, biserica și mănăstirea franciscanilor din Piața Muzeului au fost retrocedate Bisericii Romano-Catolice și puse la dispoziția iezuiților, care au înființat aici o școală proprie — o soluție temporară, până la finalizarea propriului complex. Școala iezuită a funcționat în acest spațiu împrumutat până în 1725, an în care ordinul și-a inaugurat propriul colegiu și propria biserică baroce pe strada Universității, punând astfel capăt utilizării temporare a lăcașului franciscan.",
+      photos: []
+    },
+    {
+      id: 4,
+      title: "Convictus Nobilium (azi Clădirea Echinox)",
+      address: "Str. Universității nr. 7, Cluj-Napoca",
+      lat: 46.76869, lng: 23.59012, approx: false,
+      summary: "Fostul internat al Colegiului Iezuit pentru tineri nobili, cu sigla IHS deasupra porții. În perioada comunistă a fost folosit de UBB, iar intrarea a păstrat numele revistei studențești „Echinox”.",
+      full: "„Convictus Nobilium” a fost internatul Colegiului Iezuit, ridicat în stil baroc în jurul unei curți interioare dreptunghiulare. Deasupra frontonului porții de intrare se află sigla iezuită IHS, sub care a fost plasată inscripția „CON(victus) NOB(ilium)” — mărturie directă a destinației originare a clădirii ca internat pentru tinerii nobili. Edificiul a format, împreună cu Biserica Piariștilor și cu Monumentul Fecioarei Maria, un ansamblu arhitectural unitar pe strada Universității. În perioada comunistă, clădirea a fost folosită de Universitatea Babeș-Bolyai, iar intrarea de pe strada Farkas a păstrat, până în anii 1980-1990, denumirea „Echinox” — numele revistei studențești găzduite în incintă.",
+      photos: [PHOTO_BASE + "05-convictus-nobilium_fortepan-56853-1969.jpg", PHOTO_BASE + "05-convictus-nobilium_fortepan-55012-1988-echinox.jpg"]
+    },
+    {
+      id: 5,
+      title: "Biserica Piariștilor (fosta Biserică Iezuită)",
+      address: "Str. Universității nr. 5, Cluj-Napoca",
+      lat: 46.76785, lng: 23.59062, approx: false,
+      summary: "Prima biserică de stil baroc din Transilvania, ridicată de iezuiți între 1718 și 1725 după modelul romanului Il Gesù. După dizolvarea ordinului iezuit în 1773 a trecut piariștilor; din 2022 găzduiește din nou slujbe, în română, maghiară și italiană.",
+      full: "Prima biserică de stil baroc din Transilvania a fost ridicată de iezuiți între 1718 și 1725, după modelul bisericii romane Il Gesù, pe locul unde ordinul își construise deja un colegiu și o reședință în jurul anului 1700. Construcția a fost atribuită arhitectului german Konrad Hammer. Lăcașul a fost sfințit la 13 mai 1725 de episcopul Antalfi János, cu hramul Sfintei Treimi. După dizolvarea ordinului iezuit în 1773, biserica, colegiul și mănăstirea au trecut în proprietatea ordinului piarist, nume sub care este cunoscută astăzi de cei mai mulți clujeni. Interiorul, lung de aproape 43 de metri, găzduiește basoreliefuri ale Sfintei Treimi peste portalul principal și statui ale lui Ignațiu de Loyola și Francisc Xavier peste porțile laterale. Din 2022, slujbele au fost reluate de călugării piariști, alături de preoții romano-catolici ai Parohiei Sfântul Mihail; liturghii se oficiază în limbile română, maghiară și italiană.",
+      photos: [PHOTO_BASE + "01-biserica-piaristilor_fortepan-24209-1940.jpg", PHOTO_BASE + "01-biserica-piaristilor_fortepan-202175-1972.jpg"]
+    },
+    {
+      id: 6,
+      title: "Seminarul „Sfântul Iosif” (Seminarium Bathor. Apor.)",
+      address: "Poarta seminarului, ridicată începând cu 1725",
+      lat: 46.76850, lng: 23.59030, approx: true,
+      summary: "Poarta seminarului, ridicată din 1725, poartă inscripția „Seminarium Bathor. Apor. S. Josephi”, amintind de fondatorii Ștefan Báthory și episcopul Ștefan Apor.",
+      full: "Poarta Seminarului „Sfântul Iosif” al Colegiului Iezuit din Cluj a fost construită începând cu anul 1725, ca parte a extinderii complexului educațional iezuit de pe strada Universității. Inscripția de pe portal — „Seminarium Bathor. Apor. S. Josephi” — amintește numele celor doi întemeietori și protectori ai instituției: principele Ștefan Báthory, fondatorul Colegiului Iezuit în 1581, și episcopul Ștefan Apor, care a susținut financiar dezvoltarea seminarului în secolul al XVIII-lea.",
+      photos: []
+    },
+    {
+      id: 7,
+      title: "Strada Búza (Strada Inocențiu Micu Klein)",
+      address: "Context istoric — perspectivă către ansamblul iezuit",
+      lat: 46.76744, lng: 23.58860, approx: true,
+      summary: "O fotografie din 1962 arată strada Búza, cu case vechi clujene, iar în fundal turlele Bisericii Piariștilor. Ilustrează relația vizuală dintre cartierul rezidențial istoric și complexul iezuit.",
+      full: "O fotografie din 1962 arată strada Búza, în prim-plan cu fațade modeste de case vechi clujene; în plan secund se profilează turlele Bisericii Piariștilor, vizibile dinspre Strada Universității. Imaginea ilustrează relația vizuală directă dintre cartierul rezidențial istoric și complexul religios-educațional iezuit, care domina vizual centrul orașului prin cele două turnuri ale bisericii.",
+      photos: [PHOTO_BASE + "03-strada-buza_fortepan-308559-1962.jpg"]
+    },
+    {
+      id: 8,
+      title: "Mănăstirea iezuită din cartierul Zorilor (prezent)",
+      address: "Revenirea ordinului la Cluj, anii 2000",
+      lat: 46.74631, lng: 23.58186, approx: false,
+      summary: "După aproape două secole de absență, iezuiții au revenit la Cluj la începutul anilor 2000, deschizând o mănăstire în cartierul Zorilor, alături de Centrul Manresa pentru exerciții spirituale.",
+      full: "După aproape două secole de absență din peisajul religios clujean — de la dizolvarea ordinului în 1773 până la reconstituirea sa modernă — iezuiții au revenit în oraș la începutul anilor 2000. Aici au deschis o nouă mănăstire, situată în cartierul Zorilor, alături de un centru destinat rugăciunii și exercițiilor spirituale. Astăzi, legătura istorică dintre ordin și orașul Cluj se manifestă și prin slujbele oficiate la Biserica Piariștilor — fosta biserică iezuită — reluate începând cu 2022.",
+      photos: [PHOTO_BASE + "08-manastirea-zorilor_centrul-manresa-aerian.jpg"]
+    }
+  ];
+
+  var expanded = {};
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function numberedIcon(n) {
+    return L.divIcon({
+      className: "iezuiti-marker-icon",
+      html: '<div class="iezuiti-marker-badge">' + n + "</div>",
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
+      popupAnchor: [0, -13]
+    });
+  }
+
+  function buildPopupHtml(loc) {
+    var isExpanded = !!expanded[loc.id];
+    var text = isExpanded ? loc.full : loc.summary;
+    var photosHtml = "";
+    if (loc.photos.length) {
+      photosHtml = '<div class="popup-photos">' +
+        loc.photos.map(function (src) {
+          return '<img src="' + src + '" alt="' + escapeHtml(loc.title) + '" loading="lazy">';
+        }).join("") +
+        "</div>";
+    } else {
+      photosHtml = '<p class="no-photo-note">Fără fotografie disponibilă pentru această locație.</p>';
+    }
+    return (
+      '<div class="iezuiti-popup" data-loc-id="' + loc.id + '">' +
+      "<h3>" + loc.id + ". " + escapeHtml(loc.title) + "</h3>" +
+      (loc.address ? '<p class="addr">' + escapeHtml(loc.address) + "</p>" : "") +
+      photosHtml +
+      '<p class="popup-text">' + escapeHtml(text) + "</p>" +
+      '<button type="button" class="toggle-btn">' + (isExpanded ? "Arată mai puțin" : "Citește mai mult") + "</button>" +
+      "</div>"
+    );
+  }
+
+  var map = L.map("iezuiti-map");
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  var clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    disableClusteringAtZoom: 18
+  });
+
+  var markers = [];
+  locations.forEach(function (loc) {
+    var marker = L.marker([loc.lat, loc.lng], { icon: numberedIcon(loc.id) });
+    marker.bindTooltip(loc.title, { direction: "top", offset: [0, -14] });
+    marker.bindPopup(buildPopupHtml(loc), { maxWidth: 260, minWidth: 220, maxHeight: 360 });
+    marker._iezuitiLoc = loc;
+    markers.push(marker);
+    clusterGroup.addLayer(marker);
+  });
+  map.addLayer(clusterGroup);
+
+  map.on("popupopen", function (e) {
+    var popup = e.popup;
+    var node = popup.getElement();
+    if (!node) return;
+    var btn = node.querySelector(".toggle-btn");
+    if (!btn) return;
+    btn.addEventListener("click", function (ev) {
+      // Fără asta, Leaflet.markercluster închide popup-ul la primul click intern
+      // (clusterGroup reacționează la orice click care ajunge la nivel de map).
+      ev.stopPropagation();
+      var locId = parseInt(node.querySelector(".iezuiti-popup").getAttribute("data-loc-id"), 10);
+      expanded[locId] = !expanded[locId];
+      var loc = locations.filter(function (l) { return l.id === locId; })[0];
+      popup.setContent(buildPopupHtml(loc));
+    });
+  });
+
+  // Legendă — click pe o locație duce harta la ea (dezgrupând clusterul dacă e nevoie) și deschide popup-ul
+  var legendEl = document.getElementById("iezuiti-legend");
+  locations.forEach(function (loc, i) {
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "legend-item";
+    btn.innerHTML = '<span class="legend-num">' + loc.id + '</span><span class="legend-title">' + escapeHtml(loc.title) + "</span>";
+    btn.addEventListener("click", function () {
+      var marker = markers[i];
+      clusterGroup.zoomToShowLayer(marker, function () {
+        marker.openPopup();
+      });
+    });
+    li.appendChild(btn);
+    legendEl.appendChild(li);
+  });
+
+  map.fitBounds(clusterGroup.getBounds(), { padding: [30, 30] });
+
+  window.__iezuitiHarta = { map: map, clusterGroup: clusterGroup, markers: markers };
+})();
+</script>
