@@ -26,6 +26,13 @@ care încape toate cele 8 puncte pe hartă, markerele s-ar suprapune complet și
 imposibil de apăsat individual. Clustering-ul grupează vizual punctele apropiate într-un
 cerc cu cifră; un click/tap le desparte (zoom sau spiderfy).
 
+`maxClusterRadius` (30px) și `disableClusteringAtZoom` (16) sunt calibrate ca zona
+Universității (locațiile 2, 3, 4, 5, 6, 7 — toate în centrul istoric) să se despartă în
+markere individuale de îndată ce utilizatorul dă zoom puțin peste vederea inițială de
+ansamblu — nu doar la zoom maxim. Valorile inițiale (50px / zoom 18) erau prea agresive:
+încă mai clusteriza locații la un zoom la care utilizatorul se aștepta deja să le vadă
+distinct.
+
 ## Conținut sursă
 
 Utilizatorul a furnizat un PDF cu text istoric și fotografii de arhivă. A fost convertit în
