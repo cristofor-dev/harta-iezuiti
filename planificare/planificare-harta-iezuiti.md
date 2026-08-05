@@ -33,6 +33,15 @@ ansamblu — nu doar la zoom maxim. Valorile inițiale (50px / zoom 18) erau pre
 încă mai clusteriza locații la un zoom la care utilizatorul se aștepta deja să le vadă
 distinct.
 
+La vederea de ansamblu inițială (toate cele 8 locații vizibile deodată — cerință explicită,
+nu se poate "da zoom mai mare" fără a scoate din cadru locațiile 1 și 8, aflate la ~2-3km de
+restul), un grup de 5 locații apropiate tot se clusterizează într-un singur cerc — inevitabil
+geometric, nu un bug. Problema reală era că acel cerc arăta cifra „5" (numărul de locuri din
+grup) în același stil vizual (negru, cerc, cifră albă) ca badge-ul individual al locației
+#5 — ușor de confundat. Rezolvat prin recolorarea cluster-elor în **albastru**, complet
+diferit de negrul badge-urilor individuale, ca cele două să nu mai poată fi confundate la
+prima vedere.
+
 ## Conținut sursă
 
 Utilizatorul a furnizat un PDF cu text istoric și fotografii de arhivă. A fost convertit în
