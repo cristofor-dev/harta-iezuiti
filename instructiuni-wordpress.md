@@ -65,7 +65,8 @@ var PHOTO_BASE = "https://numelesitei.ro/wp-content/uploads/2026/08/";
 - Sub hartă apare **cronologia** — toate cele 8 locuri, în ordine, cu anul fiecăruia. Click/tap pe orice rând duce harta la locul respectiv și îi deschide detaliile; rândul ales și punctul de pe hartă se colorează simultan, ca să vezi unde te afli.
 - Harta se încarcă direct pe grupul dens din centrul istoric (locurile 4, 5, 6), suficient de mărită încât acestea să apară deja separate. Locurile 1, 3 și 8 nu sunt vizibile inițial (sunt la 400 m – 3 km distanță) — se ajunge la ele din cronologie sau din butonul **„Vezi toate locurile”** din colțul hărții.
 - Un cerc **alb, cu contur și cuvântul „locuri”** înseamnă mai multe locuri grupate, nu un loc individual (locurile individuale sunt cercuri **pline, închise la culoare, cu vârf în jos**). Click/tap — sau doar ținerea cursorului peste el — îl desparte.
-- Click/tap pe un punct deschide detaliile: anul, titlul, poza (unde există) și un rezumat scurt; **„Citește mai mult”** extinde textul complet.
+- Click/tap pe un punct deschide detaliile: anul, titlul, poza (unde există) și un rezumat scurt; **„Citește mai mult”** afișează textul complet.
+- **Nimic nu se derulează în fereastra de detalii** — se vede tot textul deodată. Ca să încapă, harta se mărește singură cât e nevoie și revine la loc când închizi fereastra (butonul **×** din colțul ei). Cât timp fereastra e deschisă, butoanele de zoom se ascund, ca să nu acopere textul.
 - Pe desktop, trecerea cu mausul peste un punct îi arată denumirea și îl colorează.
 - Rotița mausului dă zoom doar după ce dai un click pe hartă — altfel derulezi pagina normal, fără ca harta să „fure” scroll-ul.
 - Testează și pe telefon — harta e gândită mobil-first.

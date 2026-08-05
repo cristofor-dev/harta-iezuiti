@@ -52,6 +52,17 @@ harta-iezuiti/
   suprapune. Locurile 1, 3 și 8 se ating din cronologie sau din butonul „Vezi toate locurile”.
 - Butoanele custom din popup trebuie să cheme `ev.stopPropagation()` — fără el,
   Leaflet.markercluster închide popup-ul la primul click intern (bug reprodus și reparat).
+- **Popup-ul nu are `maxHeight` — intenționat.** Cerință explicită: nimic nu se derulează în
+  el. În schimb `fitMapToPopup()` crește harta cât e nevoie, iar `resetMapHeight()` o readuce
+  la loc. Extinderea lărgește și popup-ul (rânduri mai lungi = mai puțină înălțime).
+- Extinderea e într-un singur sens (nu există „Arată mai puțin”); `popupclose` readuce
+  popup-ul la rezumat, altfel s-ar redeschide extins și fără cale înapoi.
+- Cât timp e deschis un popup, controalele de sus ale hărții se ascund
+  (`.iez-has-popup .leaflet-top`) — acopereau titlul și butonul de închidere. Nu încerca să
+  rezolvi cu `z-index`: panoul hărții are `transform`, deci propriul context de stivuire.
+  Ascunderea trebuie făcută cu `visibility`, nu doar `opacity` (Leaflet forțează
+  `pointer-events: auto` pe controale). Atribuirea OSM, de jos, rămâne vizibilă — obligatorie
+  prin licență.
 - **Capcane de integrare WordPress, toate prinse rulând blocul într-o temă ostilă** (fiecare
   are un comentariu în cod, nu le „curăța” fără să testezi din nou):
   - dalele hărții sunt `<img>`, deci `img { border: … }` din temă desenează o grilă peste

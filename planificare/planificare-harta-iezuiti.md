@@ -134,11 +134,37 @@ doar cromatic.
 evidențiază simultan pinul și rândul corespunzător (`aria-current`).
 
 **Alte corecții rezultate din testare:** buton „Vezi toate locurile” (vederea de ansamblu era
-altfel greu de recuperat după zoom-ul inițial); înălțimea popup-ului calculată din înălțimea
-reală a hărții, ca textul extins să nu fie tăiat; butonul de restrângere lipit jos în
-popup-ul derulabil; zoom cu rotița doar după un click pe hartă (altfel harta „fura”
-scroll-ul paginii); aducerea hărții în ecran când se alege un loc din capătul de jos al
-cronologiei; focus vizibil pe tot ce e interactiv și respectarea `prefers-reduced-motion`.
+altfel greu de recuperat după zoom-ul inițial); zoom cu rotița doar după un click pe hartă
+(altfel harta „fura” scroll-ul paginii); aducerea hărții în ecran când se alege un loc din
+capătul de jos al cronologiei; focus vizibil pe tot ce e interactiv și respectarea
+`prefers-reduced-motion`.
+
+### Zero derulare în popup — harta crește, nu conținutul se taie
+
+Cerință ulterioară a utilizatorului: **nimic nu se derulează în fereastra de conținut**, nici
+rezumatul, nici textul integral. Popup-ul nu mai are înălțime maximă; în schimb, harta însăși
+crește exact cât e nevoie ca popup-ul să încapă întreg, și revine la înălțimea ei firească
+la închidere.
+
+Textul integral al unui loc are până la ~1230 de caractere — într-un popup îngust ar însemna
+peste 900 px, mai mult decât toată harta. De aceea, la extindere popup-ul se și **lărgește**
+(până la 560 px pe desktop): rânduri mai lungi înseamnă mult mai puțină înălțime pentru
+același text. Valori măsurate: desktop, popup 597×450 px, harta crește 522 → 546 px; mobil,
+popup 361×650 px, harta 520 → 746 px.
+
+**Extinderea e într-un singur sens** (butonul „Arată mai puțin” a fost eliminat la cererea
+utilizatorului): odată afișat textul integral, butonul dispare, iar ieșirea se face prin
+închiderea popup-ului. Închiderea readuce popup-ul la rezumat — altfel s-ar redeschide cu
+textul integral și fără nicio cale înapoi.
+
+Fiindcă închiderea a devenit singura cale de ieșire, butonul „×” a fost mărit la 34 px și a
+apărut o problemă serioasă, prinsă doar de test pe ecran mic: **controalele hărții acopereau
+titlul popup-ului și chiar butonul de închidere**. Nu se poate rezolva cu `z-index` — panoul
+hărții are `transform`, deci propriul context de stivuire, care „închide” orice z-index dat
+popup-ului. Soluția: cât timp e deschis un popup, controalele de sus se ascund cu
+`visibility: hidden` (nu doar `opacity`, fiindcă Leaflet pune `pointer-events: auto` pe
+fiecare control, iar unul transparent tot ar intercepta click-urile). Atribuirea
+OpenStreetMap stă jos și rămâne vizibilă — e obligatorie prin licență.
 
 ### Izolarea CSS — blocul trăiește în tema altcuiva
 

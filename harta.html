@@ -265,6 +265,24 @@
 #iezuiti-harta-wrap .leaflet-tooltip-top::before { border-top-color: var(--iez-line-strong); }
 
 /* ---------- Popup ---------- */
+/* Controalele Leaflet stau PESTE popup și nu pot fi coborâte cu z-index: panoul hărții are
+   `transform`, deci propriul context de stivuire — orice z-index dat popup-ului rămâne
+   „prizonier” în el. Pe ecrane mici, butoanele de zoom acopereau titlul, iar butonul de
+   închidere (singura cale de ieșire) ajungea sub „Vezi toate locurile”. Soluție: cât timp e
+   deschis un popup, ascundem controalele DE SUS. Atribuirea OpenStreetMap e jos și rămâne
+   vizibilă — e obligatorie prin licență. */
+#iezuiti-harta-wrap .leaflet-top {
+  transition: opacity .15s ease;
+}
+/* `visibility: hidden`, nu doar `opacity: 0` — Leaflet pune `pointer-events: auto` pe
+   fiecare control, deci transparent tot ar fi interceptat click-urile destinate popup-ului. */
+#iezuiti-harta-wrap.iez-has-popup .leaflet-top,
+#iezuiti-harta-wrap.iez-has-popup .leaflet-top .leaflet-control {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 #iezuiti-harta-wrap .leaflet-popup-content-wrapper {
   border-radius: var(--iez-radius);
   box-shadow: 0 4px 6px rgba(28, 25, 23, .08), 0 12px 32px rgba(28, 25, 23, .16);
@@ -278,8 +296,32 @@
   border-bottom: 1px solid var(--iez-line);
   scrollbar-width: thin;
 }
-#iezuiti-harta-wrap .leaflet-popup-close-button { padding: 8px 8px 0 0 !important; color: var(--iez-muted) !important; }
-#iezuiti-harta-wrap .leaflet-popup-close-button:hover { color: var(--iez-ink) !important; }
+/* Închiderea e singura cale înapoi la hartă (butonul „Arată mai puțin” a fost eliminat),
+   deci ținta trebuie să fie confortabilă la atingere, nu un „×” minuscul. */
+#iezuiti-harta-wrap .leaflet-popup-close-button {
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  top: 5px !important;
+  right: 5px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  color: var(--iez-muted) !important;
+  background: var(--iez-surface) !important;
+  transition: background-color .15s ease, color .15s ease;
+}
+#iezuiti-harta-wrap .leaflet-popup-close-button:hover,
+#iezuiti-harta-wrap .leaflet-popup-close-button:focus-visible {
+  color: var(--iez-ink) !important;
+  background: var(--iez-surface-alt) !important;
+}
+/* titlul nu trebuie să treacă pe sub butonul de închidere */
+#iezuiti-harta-wrap .iez-popup h3,
+#iezuiti-harta-wrap .iez-popup-year { padding-right: 30px; }
 
 #iezuiti-harta-wrap .iez-popup { box-sizing: border-box; }
 #iezuiti-harta-wrap .iez-popup-year {
@@ -702,12 +744,16 @@
         (loc.address ? '<p class="iez-popup-addr">' + escapeHtml(loc.address) + "</p>" : "") +
         media +
         '<p class="iez-popup-text">' + escapeHtml(text) + "</p>" +
-        '<div class="iez-popup-actions">' +
-          '<button type="button" class="iez-toggle" aria-expanded="' + (isExpanded ? "true" : "false") + '">' +
-            "<span>" + (isExpanded ? "Arată mai puțin" : "Citește mai mult") + "</span>" +
-            '<span class="iez-chev" aria-hidden="true">▾</span>' +
-          "</button>" +
-        "</div>" +
+        // Extinderea e într-un singur sens: odată afișat textul integral, butonul dispare.
+        // Popup-ul revine la rezumat când e închis (vezi popupclose).
+        (isExpanded
+          ? ""
+          : '<div class="iez-popup-actions">' +
+              '<button type="button" class="iez-toggle" aria-expanded="false">' +
+                "<span>Citește mai mult</span>" +
+                '<span class="iez-chev" aria-hidden="true">▾</span>' +
+              "</button>" +
+            "</div>") +
       "</div>"
     );
   }
@@ -739,10 +785,46 @@
     }
   });
 
-  // Popup-ul trăiește în interiorul hărții și e tăiat de marginile ei, deci înălțimea lui
-  // maximă se calculează din înălțimea reală a hărții (care variază cu viewport-ul), nu fix.
-  var mapH = document.getElementById("iezuiti-map").clientHeight || 420;
-  var popupMaxHeight = Math.max(190, Math.min(360, mapH - 150));
+  // Popup-ul NU are înălțime maximă: nimic nu se derulează în interiorul lui, nici rezumatul,
+  // nici textul integral. Fiindcă popup-ul e tăiat de marginile hărții, harta însăși crește
+  // cât e nevoie (vezi fitMapToPopup) și revine la loc când popup-ul se închide.
+  var mapEl = document.getElementById("iezuiti-map");
+  var wrapEl = document.getElementById("iezuiti-harta-wrap");
+  var baseMapHeight = mapEl.clientHeight || 420;
+  var POPUP_W = 268; // lățimea în stare restrânsă
+
+  // Lățimea în stare extinsă: un popup mai lat înseamnă rânduri mai lungi, deci mult mai
+  // puțină înălțime pentru același text.
+  function expandedWidth() {
+    return Math.max(POPUP_W, Math.min(560, mapEl.clientWidth - 48));
+  }
+
+  // Crește harta cât să încapă popup-ul întreg, apoi repoziționează popup-ul în cadru.
+  function fitMapToPopup(popup) {
+    if (!popup) return;
+    var el = popup.getElement();
+    if (!el) return;
+    var needed = el.offsetHeight + 96; // popup + acul markerului + puțin aer
+    var target = Math.max(baseMapHeight, needed);
+    if (Math.abs(mapEl.clientHeight - target) > 2) {
+      mapEl.style.height = target + "px";
+      map.invalidateSize(false);
+    }
+    popup.update(); // re-calculează poziția/panoramarea la noua înălțime
+  }
+
+  function resetMapHeight() {
+    if (!mapEl.style.height) return;
+    mapEl.style.height = "";
+    map.invalidateSize(false);
+  }
+
+  // La redimensionarea ferestrei, înălțimea „naturală” (clamp cu vh) se schimbă — o
+  // recitim, dar doar când nu e niciun popup deschis, ca să nu stricăm o hartă crescută.
+  window.addEventListener("resize", function () {
+    if (mapEl.style.height) return;
+    baseMapHeight = mapEl.clientHeight || baseMapHeight;
+  });
 
   var markers = [];
   locations.forEach(function (loc) {
@@ -750,7 +832,7 @@
     marker.bindTooltip('<span class="iez-tt-year">' + escapeHtml(loc.year) + "</span>" + escapeHtml(loc.title), {
       direction: "top"
     });
-    marker.bindPopup(buildPopupHtml(loc), { maxWidth: 268, minWidth: 236, maxHeight: popupMaxHeight });
+    marker.bindPopup(buildPopupHtml(loc), { maxWidth: POPUP_W, minWidth: 236 });
     marker._iezuitiLoc = loc;
     markers.push(marker);
     clusterGroup.addLayer(marker);
@@ -783,6 +865,13 @@
     // Doar marcăm rândul activ — fără scrollIntoView: ar derula pagina și ar scoate
     // popup-ul (care trăiește în interiorul hărții) în afara ecranului.
     if (locId) setActive(locId);
+    wrapEl.classList.add("iez-has-popup");
+
+    // Un loc redeschis își păstrează starea (extins/restrâns), deci lățimea se stabilește
+    // după ea, nu implicit. Apoi harta crește cât să încapă popup-ul întreg, fără derulare.
+    popup.options.maxWidth = expanded[locId] ? expandedWidth() : POPUP_W;
+    popup.update();
+    fitMapToPopup(popup);
 
     var btn = node.querySelector(".iez-toggle");
     if (!btn) return;
@@ -790,13 +879,30 @@
       // Fără asta, Leaflet.markercluster închide popup-ul la primul click intern
       // (clusterGroup reacționează la orice click care ajunge la nivel de map).
       ev.stopPropagation();
-      expanded[locId] = !expanded[locId];
+      expanded[locId] = true;
       var loc = locations.filter(function (l) { return l.id === locId; })[0];
+      // Extins: popup mai lat (rânduri mai lungi = mai puțină înălțime) și harta crește
+      // cât să încapă tot textul, ca să nu apară derulare în interiorul popup-ului.
+      popup.options.maxWidth = expandedWidth();
       popup.setContent(buildPopupHtml(loc));
+      fitMapToPopup(popup);
     });
   });
 
-  map.on("popupclose", function () { setActive(null); });
+  map.on("popupclose", function (e) {
+    setActive(null);
+    wrapEl.classList.remove("iez-has-popup");
+    resetMapHeight();
+    // Fără buton de restrângere, popup-ul se readuce la rezumat la închidere — altfel
+    // s-ar redeschide cu textul integral și fără nicio cale înapoi.
+    var src = e.popup && e.popup._source;
+    var loc = src && src._iezuitiLoc;
+    if (loc && expanded[loc.id]) {
+      expanded[loc.id] = false;
+      e.popup.options.maxWidth = POPUP_W;
+      e.popup.setContent(buildPopupHtml(loc));
+    }
+  });
 
   // La hover susținut pe un grup, zoom automat spre el ca să se despartă în pini
   // individuali — cu întârziere, ca simpla trecere a cursorului să nu-l declanșeze.
