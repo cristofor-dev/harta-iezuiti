@@ -238,6 +238,7 @@
   background: transparent !important; color: #7a4a1e !important; font-family: 'EB Garamond', serif; font-size: 16px;
   cursor: pointer; box-shadow: none !important;
 }
+#iezuiti-1730-wrap .h-more[hidden] { display: none; }
 #iezuiti-1730-wrap .h-more:hover { background: rgba(168, 113, 44, .12) !important; }
 #iezuiti-1730-wrap .h-go {
   padding: 9px 18px; border-radius: 999px; background: var(--c-red) !important; color: #f6ecd6 !important;
@@ -592,6 +593,20 @@
     }
   }
 
+  // „Află mai multe” are rost doar dacă există ceva de arătat: un text complet diferit de cel scurt,
+  // sau un text identic care nu încape în cele 3 rânduri. Măsurat din layout, deci ține cont de lățime.
+  function updateMore(cur) {
+    var d = $("h-desc"), btn = $("h-more");
+    var needed = cur.short !== cur.desc || state.expanded || d.scrollHeight > d.clientHeight + 1;
+    btn.hidden = !needed;
+  }
+  window.addEventListener("resize", function () {
+    if (state.sel != null) updateMore(LOCS[idx(state.sel)]);
+  });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { if (state.sel != null) updateMore(LOCS[idx(state.sel)]); });
+  }
+
   var shownId = null, shownPhoto = -1;
   function render() {
     stage.style.transform = "scale(" + state.zoom + ") translate(" + state.panX + "%," + state.panY + "%)";
@@ -621,6 +636,7 @@
     $("h-desc").textContent = state.expanded ? cur.desc : cur.short;
     $("h-desc").classList.toggle("is-open", state.expanded);
     $("h-more").textContent = state.expanded ? "Arată mai puțin" : "Află mai multe";
+    updateMore(cur);
     $("h-period").textContent = cur.period;
     $("h-today").textContent = cur.today;
     $("h-go").href = "https://www.google.com/maps/dir/?api=1&destination=" + cur.lat + "," + cur.lng + "&travelmode=driving";
