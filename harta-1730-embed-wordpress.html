@@ -192,7 +192,7 @@
 #iezuiti-1730-wrap .h-x:hover { background: var(--c-ink) !important; color: var(--c-parch-1) !important; }
 #iezuiti-1730-wrap .h-grid { display: grid; grid-template-columns: 1.05fr 1fr; }
 #iezuiti-1730-wrap .h-photo {
-  position: relative; min-height: 380px; background: #d8c8a4; display: flex; align-items: center; justify-content: center;
+  position: relative; min-height: 300px; background: #d8c8a4; display: flex; align-items: center; justify-content: center;
 }
 #iezuiti-1730-wrap .h-photo .h-pimg { position: absolute; inset: 0; width: 100% !important; height: 100%; object-fit: cover; }
 #iezuiti-1730-wrap .h-pnav {
@@ -595,16 +595,30 @@
 
   // „Află mai multe” are rost doar dacă există ceva de arătat: un text complet diferit de cel scurt,
   // sau un text identic care nu încape în cele 3 rânduri. Măsurat din layout, deci ține cont de lățime.
+  // Fără scroll în modal (pe desktop): dacă tot conținutul nu încape în card, corpul se micșorează treptat
+  // (CSS zoom) până încape — cu o limită, ca textul să rămână lizibil. Expandat = scroll permis (text lung).
+  var body = document.querySelector(".h-body"), card = $("h-card");
+  function fitCard() {
+    if (!body.style) return;
+    body.style.zoom = "";
+    if (state.sel == null || state.expanded || window.matchMedia("(max-width: 760px)").matches) return;
+    var z = 1;
+    while (card.scrollHeight > card.clientHeight + 1 && z > 0.64) {
+      z = Math.round((z - 0.03) * 100) / 100;
+      body.style.zoom = z;
+    }
+  }
+
   function updateMore(cur) {
     var d = $("h-desc"), btn = $("h-more");
     var needed = cur.short !== cur.desc || state.expanded || d.scrollHeight > d.clientHeight + 1;
     btn.hidden = !needed;
   }
   window.addEventListener("resize", function () {
-    if (state.sel != null) updateMore(LOCS[idx(state.sel)]);
+    if (state.sel != null) { updateMore(LOCS[idx(state.sel)]); fitCard(); }
   });
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () { if (state.sel != null) updateMore(LOCS[idx(state.sel)]); });
+    document.fonts.ready.then(function () { if (state.sel != null) { updateMore(LOCS[idx(state.sel)]); fitCard(); } });
   }
 
   var shownId = null, shownPhoto = -1;
@@ -642,6 +656,7 @@
     $("h-go").href = "https://www.google.com/maps/dir/?api=1&destination=" + cur.lat + "," + cur.lng + "&travelmode=driving";
     $("h-prev").textContent = "← " + prev.name;
     $("h-next").textContent = next.name + " →";
+    fitCard();
   }
 
   render();
