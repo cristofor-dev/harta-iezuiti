@@ -144,23 +144,28 @@
 @keyframes hc-bob { 0%, 100% { transform: translate(-50%, -50%) scale(1.18); } 50% { transform: translate(-50%, -50%) scale(1.3); } }
 @keyframes hc-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* ---------- Controale zoom ---------- */
+@media (min-width: 761px) {
+  #iezuiti-1730-wrap .h-head { flex-wrap: nowrap; align-items: center; gap: 24px; }
+  #iezuiti-1730-wrap .h-titles { flex: 1 1 auto; min-width: 0; }
+  #iezuiti-1730-wrap .h-tools { flex: none; }
+  /* Titlul rămâne pe un rând lângă controale: se micșorează (max 26px) când conținutul e îngust. */
+  #iezuiti-1730-wrap .h-inner { container-type: inline-size; }
+  #iezuiti-1730-wrap .h-title { font-size: clamp(18px, calc((100cqw - 200px) / 22.5), 26px); white-space: nowrap; }
+}
+/* ---------- Controale zoom (în antet, în afara hărții: în imagine acopereau textul desenat) ---------- */
+#iezuiti-1730-wrap .h-tools { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 #iezuiti-1730-wrap .h-zoom {
-  position: absolute; right: 14px; bottom: 14px; z-index: 30; display: flex; flex-direction: column; gap: 6px;
-  background: rgba(20, 15, 9, .72); border: 1px solid rgba(168, 113, 44, .5); border-radius: 10px; padding: 6px;
-  backdrop-filter: blur(4px);
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(20, 15, 9, .72); border: 1px solid rgba(168, 113, 44, .5); border-radius: 10px; padding: 4px;
 }
 #iezuiti-1730-wrap .h-zoom button {
-  width: 34px; height: 34px; min-width: 0; padding: 0; margin: 0; border: 0 !important; border-radius: 6px;
+  width: 32px; height: 32px; min-width: 0; padding: 0; margin: 0; border: 0 !important; border-radius: 6px;
   background: rgba(255, 255, 255, .08) !important; color: #f0dcae !important; font-size: 18px; cursor: pointer;
   font-family: 'EB Garamond', serif; box-shadow: none !important; line-height: 1;
 }
 #iezuiti-1730-wrap .h-zoom button:hover { background: rgba(242, 193, 78, .25) !important; }
 #iezuiti-1730-wrap .h-zoom button.h-reset { font-size: 14px; }
-#iezuiti-1730-wrap .h-zoomlabel {
-  position: absolute; left: 14px; bottom: 14px; z-index: 30; font-size: 12px; letter-spacing: .05em; color: #cbb98d;
-  background: rgba(20, 15, 9, .6); border: 1px solid rgba(168, 113, 44, .4); border-radius: 999px; padding: 4px 10px;
-}
+#iezuiti-1730-wrap .h-zoomlabel { min-width: 46px; text-align: center; font-size: 13px; letter-spacing: .05em; color: #cbb98d; }
 
 /* ---------- Modal ---------- */
 #iezuiti-1730-wrap .h-overlay {
@@ -265,6 +270,7 @@
 @media (max-width: 760px) {
   #iezuiti-1730-wrap { padding: 18px 12px 36px; }
   #iezuiti-1730-wrap .h-title { font-size: 19px; }
+  #iezuiti-1730-wrap .h-tools { align-items: flex-start; }
   #iezuiti-1730-wrap .h-sub { font-size: 15px; }
   #iezuiti-1730-wrap .h-grid { grid-template-columns: 1fr; }
   #iezuiti-1730-wrap .h-photo { min-height: 140px; }
@@ -297,17 +303,19 @@
         <h1 class="h-title">Cluj &middot; Clausenburg &middot; Kolozsvár</h1>
         <p class="h-sub">Hartă interactivă a cetății, anul 1730 &mdash; alege o locație numerotată</p>
       </div>
-      <span class="h-count" id="h-count"></span>
+      <div class="h-tools">
+        <div class="h-zoom">
+          <button type="button" id="h-zout" aria-label="Zoom out">&ndash;</button>
+          <span class="h-zoomlabel" id="h-zlabel">100%</span>
+          <button type="button" id="h-zin" aria-label="Zoom in">+</button>
+          <button type="button" id="h-zreset" class="h-reset" aria-label="Resetează zoom">&#10226;</button>
+        </div>
+        <span class="h-count" id="h-count"></span>
+      </div>
     </div>
 
     <div class="h-map" id="h-map">
       <div class="h-stage" id="h-stage"></div>
-      <div class="h-zoom">
-        <button type="button" id="h-zin" aria-label="Zoom in">+</button>
-        <button type="button" id="h-zout" aria-label="Zoom out">&ndash;</button>
-        <button type="button" id="h-zreset" class="h-reset" aria-label="Resetează zoom">&#10226;</button>
-      </div>
-      <span class="h-zoomlabel" id="h-zlabel">100%</span>
 
       <div class="h-overlay" id="h-overlay" role="dialog" aria-modal="true" aria-labelledby="h-name" aria-hidden="true">
         <div class="h-card" id="h-card">
