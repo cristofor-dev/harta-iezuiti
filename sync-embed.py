@@ -15,8 +15,6 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SRC = HERE / "harta.html"
-OUT = HERE / "harta-embed-wordpress.html"
 
 PHOTO_BASE_SRC = (
     '  var PHOTO_BASE = "content/photo/"; '
@@ -27,10 +25,36 @@ PHOTO_BASE_EMBED = """  // ATENȚIE: înlocuiește valoarea de mai jos cu URL-ul
   // Exemplu: "https://numelesitei.ro/wp-content/uploads/2026/08/"
   var PHOTO_BASE = "content/photo/";"""
 
+# Fiecare pagină: (sursă, ieșire, id-ul div-ului rădăcină, linia IMG_BASE din sursă, forma ei în embed)
+PAGES = [
+    {
+        "src": HERE / "harta.html",
+        "out": HERE / "harta-embed-wordpress.html",
+        "root_id": "iezuiti-harta-wrap",
+        "base_src": PHOTO_BASE_SRC,
+        "base_embed": PHOTO_BASE_EMBED,
+        "title": "Harta Iezuiților în Cluj-Napoca",
+    },
+    {
+        "src": HERE / "harta-1730.html",
+        "out": HERE / "harta-1730-embed-wordpress.html",
+        "root_id": "iezuiti-1730-wrap",
+        "base_src": (
+            '  var IMG_BASE = "content/harta-1730/"; '
+            "// în WordPress: se înlocuiește cu URL-ul din Media Library"
+        ),
+        "base_embed": """  // ATENȚIE: înlocuiește valoarea de mai jos cu URL-ul din Media Library WordPress
+  // unde ai încărcat imaginea hărții (cluj-map-1730.webp), păstrând "/" la final.
+  // Exemplu: "https://numelesitei.ro/wp-content/uploads/2026/08/"
+  var IMG_BASE = "content/harta-1730/";""",
+        "title": "Harta Cluj 1730",
+    },
+]
+
 BANNER = """<!--
-  Harta Iezuiților în Cluj-Napoca — bloc pentru WordPress (Custom HTML).
-  GENERAT AUTOMAT din harta.html — nu edita direct acest fișier;
-  modifică harta.html și rulează `python sync-embed.py`.
+  {title} — bloc pentru WordPress (Custom HTML).
+  GENERAT AUTOMAT din {src} — nu edita direct acest fișier;
+  modifică {src} și rulează `python sync-embed.py`.
 -->"""
 
 
@@ -39,34 +63,41 @@ def fail(msg):
     sys.exit(1)
 
 
-def main():
-    if not SRC.exists():
-        fail(f"nu găsesc {SRC}")
-    html = SRC.read_text(encoding="utf-8")
+def build(page):
+    src, out_path = page["src"], page["out"]
+    if not src.exists():
+        fail(f"nu găsesc {src}")
+    html = src.read_text(encoding="utf-8")
 
     head_match = re.search(
         r'(<link rel="stylesheet".*?</style>)', html, re.S
     )
     if not head_match:
-        fail("nu am găsit blocul <link>…</style> din <head>")
+        fail(f"{src.name}: nu am găsit blocul <link>…</style> din <head>")
 
     body_match = re.search(
-        r'(<div id="iezuiti-harta-wrap">.*</script>)', html, re.S
+        r'(<div id="%s">.*</script>)' % re.escape(page["root_id"]), html, re.S
     )
     if not body_match:
-        fail("nu am găsit conținutul dintre <div id=\"iezuiti-harta-wrap\"> și ultimul </script>")
+        fail(f"{src.name}: nu am găsit conținutul dintre <div id=\"{page['root_id']}\"> și ultimul </script>")
 
     assets = head_match.group(1).strip()
     body = body_match.group(1).strip()
 
-    if PHOTO_BASE_SRC not in body:
-        fail("linia PHOTO_BASE din harta.html nu mai are forma așteptată — actualizează sync-embed.py")
-    body = body.replace(PHOTO_BASE_SRC, PHOTO_BASE_EMBED)
+    if page["base_src"] not in body:
+        fail(f"{src.name}: linia cu URL-ul de bază nu mai are forma așteptată — actualizează sync-embed.py")
+    body = body.replace(page["base_src"], page["base_embed"])
 
-    out = f"{BANNER}\n\n{assets}\n\n{body}\n"
-    OUT.write_text(out, encoding="utf-8")
+    banner = BANNER.format(title=page["title"], src=src.name)
+    out = f"{banner}\n\n{assets}\n\n{body}\n"
+    out_path.write_text(out, encoding="utf-8")
 
-    print(f"OK — {OUT.name} regenerat din {SRC.name} ({len(out.splitlines())} linii).")
+    print(f"OK — {out_path.name} regenerat din {src.name} ({len(out.splitlines())} linii).")
+
+
+def main():
+    for page in PAGES:
+        build(page)
 
 
 if __name__ == "__main__":
