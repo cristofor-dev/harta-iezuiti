@@ -95,7 +95,7 @@
 
 /* ---------- Markere ---------- */
 #iezuiti-1730-wrap .h-marker {
-  position: absolute; transform: translate(-50%, -50%); width: 46px; height: 46px; padding: 0; margin: 0;
+  position: absolute; transform: translate(-50%, -50%); width: 36px; height: 36px; padding: 0; margin: 0;
   border: 0 !important; background: transparent !important; box-shadow: none !important;
   cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;
   min-width: 0; min-height: 0;
@@ -103,18 +103,18 @@
 #iezuiti-1730-wrap .h-marker:hover { filter: brightness(1.25); }
 #iezuiti-1730-wrap .h-marker:focus-visible { outline: 2px solid var(--c-gold-hi); outline-offset: 2px; border-radius: 999px; }
 #iezuiti-1730-wrap .h-dot {
-  width: 30px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
-  font-family: 'Cinzel', serif; font-size: 15px; font-weight: 600; line-height: 1;
+  width: 22px; height: 22px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600; line-height: 1;
   transition: background .2s, color .2s, box-shadow .2s;
-  background: #fff; color: #000; border: 2px solid rgba(28, 21, 14, .55); box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+  background: #fff; color: #000; border: 1.5px solid rgba(28, 21, 14, .55); box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
 }
 #iezuiti-1730-wrap .h-ring {
-  position: absolute; inset: -6px; border-radius: 999px; border: 2px solid var(--c-gold-hi);
+  position: absolute; inset: -4px; border-radius: 999px; border: 2px solid var(--c-gold-hi);
   pointer-events: none; display: none;
 }
 #iezuiti-1730-wrap .h-marker.is-on { z-index: 20; animation: hc-bob 1.9s ease-in-out infinite; }
 #iezuiti-1730-wrap .h-marker.is-on .h-dot {
-  background: var(--c-gold-hi); color: var(--c-ink); border-color: var(--c-red); box-shadow: 0 0 26px rgba(242, 193, 78, .9);
+  background: var(--c-gold-hi); color: var(--c-ink); border-color: var(--c-red); box-shadow: 0 0 20px rgba(242, 193, 78, .9);
 }
 #iezuiti-1730-wrap .h-marker.is-on .h-ring { display: block; animation: hc-ring 1.9s ease-out infinite; }
 #iezuiti-1730-wrap .h-marker.is-on .h-ring + .h-ring { animation-delay: .95s; }
@@ -256,8 +256,8 @@
   #iezuiti-1730-wrap .h-photo:not(:has(.h-pimg)) { display: none; }
   #iezuiti-1730-wrap .h-nav { flex-direction: column; padding-top: 8px; }
   #iezuiti-1730-wrap .h-nav button { font-size: 15px; padding: 10px 12px; }
-  #iezuiti-1730-wrap .h-marker { width: 38px; height: 38px; }
-  #iezuiti-1730-wrap .h-dot { width: 24px; height: 24px; font-size: 12px; }
+  #iezuiti-1730-wrap .h-marker { width: 30px; height: 30px; }
+  #iezuiti-1730-wrap .h-dot { width: 18px; height: 18px; font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   #iezuiti-1730-wrap .h-marker.is-on, #iezuiti-1730-wrap .h-marker.is-on .h-ring { animation: none; }
