@@ -41,12 +41,16 @@ PAGES = [
         "root_id": "iezuiti-1730-wrap",
         "base_src": (
             '  var IMG_BASE = "content/harta-1730/"; '
-            "// în WordPress: se înlocuiește cu URL-ul din Media Library"
+            "// în WordPress: se înlocuiește cu URL-ul din Media Library\n"
+            '  var PHOTO_BASE = "content/photo/"; '
+            "// fotografiile locațiilor (aceleași ca la harta Leaflet)"
         ),
         "base_embed": """  // ATENȚIE: înlocuiește valoarea de mai jos cu URL-ul din Media Library WordPress
   // unde ai încărcat imaginea hărții (cluj-map-1730.webp), păstrând "/" la final.
   // Exemplu: "https://numelesitei.ro/wp-content/uploads/2026/08/"
-  var IMG_BASE = "content/harta-1730/";""",
+  var IMG_BASE = "content/harta-1730/";
+  // Fotografiile locațiilor: același folder din Media Library ca la harta Leaflet (vezi instructiuni-wordpress.md).
+  var PHOTO_BASE = "content/photo/";""",
         "title": "Harta Cluj 1730",
     },
 ]

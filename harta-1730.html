@@ -154,7 +154,18 @@
 #iezuiti-1730-wrap .h-photo {
   position: relative; min-height: 380px; background: #d8c8a4; display: flex; align-items: center; justify-content: center;
 }
-#iezuiti-1730-wrap .h-photo img { position: absolute; inset: 0; width: 100% !important; height: 100%; object-fit: cover; }
+#iezuiti-1730-wrap .h-photo .h-pimg { position: absolute; inset: 0; width: 100% !important; height: 100%; object-fit: cover; }
+#iezuiti-1730-wrap .h-pnav {
+  position: absolute; left: 0; right: 0; bottom: 12px; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+#iezuiti-1730-wrap .h-pnav button {
+  width: 34px; height: 34px; min-width: 0; padding: 0; margin: 0; border-radius: 999px; border: 0 !important;
+  background: rgba(20, 15, 9, .65) !important; color: #f0dcae !important; font-size: 16px; line-height: 1; cursor: pointer; box-shadow: none !important;
+}
+#iezuiti-1730-wrap .h-pnav button:hover { background: rgba(140, 47, 36, .9) !important; }
+#iezuiti-1730-wrap .h-pcount {
+  font-size: 12px; letter-spacing: .05em; color: #f0dcae; background: rgba(20, 15, 9, .65); border-radius: 999px; padding: 4px 10px;
+}
 #iezuiti-1730-wrap .h-ph {
   display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; text-align: center;
   font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-ink-4);
@@ -232,7 +243,7 @@
   /* Harta e prea mică pe telefon pentru un modal în interiorul ei: overlay pe tot ecranul. */
   #iezuiti-1730-wrap .h-overlay { position: fixed; z-index: 99999; padding: 12px; }
   #iezuiti-1730-wrap .h-card { max-height: 100%; }
-  #iezuiti-1730-wrap .h-photo:not(:has(img)) { display: none; }
+  #iezuiti-1730-wrap .h-photo:not(:has(.h-pimg)) { display: none; }
   #iezuiti-1730-wrap .h-nav { flex-direction: column; padding-top: 8px; }
   #iezuiti-1730-wrap .h-nav button { font-size: 15px; padding: 10px 12px; }
   #iezuiti-1730-wrap .h-marker { width: 38px; height: 38px; }
@@ -300,35 +311,40 @@
   "use strict";
 
   var IMG_BASE = "content/harta-1730/"; // în WordPress: se înlocuiește cu URL-ul din Media Library
+  var PHOTO_BASE = "content/photo/"; // fotografiile locațiilor (aceleași ca la harta Leaflet)
 
   // x, y = % pe imagine; lat/lng = destinația pentru Google Maps.
   // Pozițiile pe hartă și coordonatele GPS sunt ESTIMATE — de verificat (vezi README-ul designului).
-  // photo (opțional): numele fișierului din IMG_BASE; fără el, modalul arată un placeholder.
+  // photos (opțional): fișiere din PHOTO_BASE; fără ele, modalul arată un placeholder.
   var LOCS = [
-    { id: 1, x: 55.5, y: 38.3, name: "Biserica Sfânta Treime", kind: "Biserică",
-      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7712, lng: 23.5925,
-      short: "Biserica Sfânta Treime, reper de la 1730 în partea de nord-est a cetății. Turnul ei se vede printre acoperișurile cartierului.",
-      desc: "Biserica Sfânta Treime, reper de la 1730 în partea de nord-est a cetății. Turnul ei se vede printre acoperișurile cartierului." },
+    { id: 1, x: 55.5, y: 38.3, name: "Biserica Sfânta Treime", kind: "Biserică barocă",
+      period: "1718–1725", today: "Strada Universității nr. 5 (Biserica Piariștilor)", lat: 46.7712, lng: 23.5925,
+      photos: ["01-biserica-piaristilor_fortepan-24209-1940.jpg", "01-biserica-piaristilor_fortepan-202175-1972.jpg"],
+      short: "Prima biserică de stil baroc din Transilvania, ridicată de iezuiți între 1718 și 1725 după modelul romanului Il Gesù. După dizolvarea ordinului iezuit în 1773 a trecut piariștilor; din 2022 găzduiește din nou slujbe, în română, maghiară și italiană.",
+      desc: "Prima biserică de stil baroc din Transilvania a fost ridicată de iezuiți între 1718 și 1725, după modelul bisericii romane Il Gesù, pe locul unde ordinul își construise deja un colegiu și o reședință în jurul anului 1700. Construcția a fost atribuită arhitectului german Konrad Hammer. Lăcașul a fost sfințit la 13 mai 1725 de episcopul Antalfi János, cu hramul Sfintei Treimi. După dizolvarea ordinului iezuit în 1773, biserica, colegiul și mănăstirea au trecut în proprietatea ordinului piarist, nume sub care este cunoscută astăzi de cei mai mulți clujeni. Interiorul, lung de aproape 43 de metri, găzduiește basoreliefuri ale Sfintei Treimi peste portalul principal și statui ale lui Ignațiu de Loyola și Francisc Xavier peste porțile laterale. Din 2022, slujbele au fost reluate de călugării piariști, alături de preoții romano-catolici ai Parohiei Sfântul Mihail; liturghii se oficiază în limbile română, maghiară și italiană." },
     { id: 2, x: 58.5, y: 80.0, name: "Colegiul Societății lui Iisus (SJ)", kind: "Colegiu iezuit",
-      period: "sec. XVII–XVIII", today: "Zona Pieței Unirii – Str. Universității", lat: 46.7688, lng: 23.5892,
-      short: "Colegiul iezuit, alăturat bisericii iezuiților, a fost centrul învățământului superior din Cluj. Aici s-au format generații de elevi din Transilvania.",
-      desc: "Colegiul iezuit, alăturat bisericii iezuiților, a fost centrul învățământului superior din Cluj. Aici s-au format generații de elevi din Transilvania." },
+      period: "din 1581", today: "Clădirea centrală a UBB, Str. Universității", lat: 46.7688, lng: 23.5892,
+      photos: ["02-universitatea-babes-bolyai_fortepan-29760-1910.jpg"],
+      short: "Colegiul Iezuit din Cluj a fost fondat în 1581 de principele Ștefan Báthory — una dintre primele instituții de învățământ superior umanist din Transilvania. Clădirea centrală a UBB de astăzi continuă simbolic această tradiție universitară.",
+      desc: "Colegiul Iezuit din Cluj a fost fondat în 1581, la inițiativa principelui Ștefan Báthory, ca instituție de învățământ superior umanist și teologic — una dintre primele de acest tip din Transilvania. De-a lungul a aproape două secole, colegiul a funcționat alături de biserică și de internatul propriu, formând un ansamblu educațional unitar pe actuala stradă a Universității. Clădirea centrală a Universității Babeș-Bolyai de astăzi continuă, simbolic și funcțional, această tradiție universitară inaugurată de iezuiți, fiind ridicată pe terenul și în vecinătatea fostului complex colegial." },
     { id: 3, x: 64.6, y: 67.0, name: "Convictul nobiliar", kind: "Internat",
-      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7696, lng: 23.5905,
-      short: "Convictul nobiliar găzduia și educa fiii nobilimii transilvănene, în legătură cu colegiul iezuit.",
-      desc: "Convictul nobiliar găzduia și educa fiii nobilimii transilvănene, în legătură cu colegiul iezuit." },
-    { id: 4, x: 72.2, y: 63.8, name: "Convictul pentru elevi săraci „Sf. Iosif”", kind: "Internat",
-      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7699, lng: 23.5918,
-      short: "Convictul „Sf. Iosif” oferea cazare și învățătură elevilor lipsiți de mijloace, completând rețeaua școlară iezuită.",
-      desc: "Convictul „Sf. Iosif” oferea cazare și învățătură elevilor lipsiți de mijloace, completând rețeaua școlară iezuită." },
+      period: "cca. 1700", today: "Str. Universității nr. 7 (Clădirea Echinox)", lat: 46.7696, lng: 23.5905,
+      photos: ["05-convictus-nobilium_fortepan-56853-1969.jpg", "05-convictus-nobilium_fortepan-55012-1988-echinox.jpg"],
+      short: "Fostul internat al Colegiului Iezuit pentru tineri nobili, cu sigla IHS deasupra porții. În perioada comunistă a fost folosit de UBB, iar intrarea a păstrat numele revistei studențești „Echinox”.",
+      desc: "„Convictus Nobilium” a fost internatul Colegiului Iezuit, ridicat în stil baroc în jurul unei curți interioare dreptunghiulare. Deasupra frontonului porții de intrare se află sigla iezuită IHS, sub care a fost plasată inscripția „CON(victus) NOB(ilium)” — mărturie directă a destinației originare a clădirii ca internat pentru tinerii nobili. Edificiul a format, împreună cu Biserica Piariștilor și cu Monumentul Fecioarei Maria, un ansamblu arhitectural unitar pe strada Universității. În perioada comunistă, clădirea a fost folosită de Universitatea Babeș-Bolyai, iar intrarea de pe strada Farkas a păstrat, până în anii 1980-1990, denumirea „Echinox” — numele revistei studențești găzduite în incintă." },
+    { id: 4, x: 72.2, y: 63.8, name: "Convictul pentru elevi săraci „Sf. Iosif”", kind: "Seminar și internat",
+      period: "din 1725", today: "Poarta seminarului, Str. Universității", lat: 46.7699, lng: 23.5918,
+      short: "Poarta seminarului, ridicată din 1725, poartă inscripția „Seminarium Bathor. Apor. S. Josephi”, amintind de fondatorii Ștefan Báthory și episcopul Ștefan Apor.",
+      desc: "Poarta Seminarului „Sfântul Iosif” al Colegiului Iezuit din Cluj a fost construită începând cu anul 1725, ca parte a extinderii complexului educațional iezuit de pe strada Universității. Inscripția de pe portal — „Seminarium Bathor. Apor. S. Josephi” — amintește numele celor doi întemeietori și protectori ai instituției: principele Ștefan Báthory, fondatorul Colegiului Iezuit în 1581, și episcopul Ștefan Apor, care a susținut financiar dezvoltarea seminarului în secolul al XVIII-lea." },
     { id: 5, x: 82.5, y: 70.7, name: "Biserica reformată Sf. Gheorghe (fosta franciscană și SJ)", kind: "Biserică și fost ansamblu monahal",
-      period: "sec. XV, refăcută în sec. XVIII", today: "Strada Mihail Kogălniceanu", lat: 46.7686, lng: 23.5916,
-      short: "Ansamblu monahal cu biserică gotică, aflat în colțul răsăritean al cetății. A trecut prin mai multe ordine călugărești, fiind unul dintre cele mai vechi lăcașuri ale orașului.",
-      desc: "Ansamblu monahal cu biserică gotică, aflat în colțul răsăritean al cetății. A trecut prin mai multe ordine călugărești de-a lungul secolelor, fiind unul dintre cele mai vechi lăcașuri ale orașului." },
-    { id: 6, x: 33.2, y: 63.8, name: "Capela Caianu", kind: "Capelă",
-      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7706, lng: 23.5868,
-      short: "Capela Caianu, mică capelă legată de casa familiei Caianu, în vestul cetății.",
-      desc: "Capela Caianu, mică capelă legată de casa familiei Caianu, în vestul cetății." },
+      period: "1579–1603 (colegiul iezuit)", today: "Strada Mihail Kogălniceanu", lat: 46.7686, lng: 23.5916,
+      short: "În 1579, la intervenția lui Ștefan Báthory, orașul a cedat iezuiților fostul convent franciscan pentru a întemeia un colegiu. În 1603 complexul a fost devastat de cetățenii unitarieni.",
+      desc: "În 1579, la intervenția principelui Ștefan Báthory, orașul a cedat fostul convent franciscan ordinului iezuit, în vederea fondării unui colegiu. Așezarea iezuiților într-un oraș locuit în majoritate de unitarieni a urmărit întărirea pozițiilor bisericii catolice. În 1579 iezuiții au început activitatea de învățământ în două săli de clasă, iar în 1580 arhitectul principelui a inspectat clădirile; raportul trimis la Roma arăta că din 8000 de forinți se putea reface mănăstirea și construi școala. Cum pe parcelă nu mai era loc pentru o școală nouă, au preluat terenul părăsit al clariselor. În anul următor au urmat ample lucrări de reparații și construirea școlii pe parcela vecină. În aprilie 1581 iezuiții s-au mutat în fosta mănăstire benedictină din Cluj-Mănăștur, iar curând s-a organizat festivitatea de deschidere a școlii. În 1595, într-o conjunctură politică mai favorabilă catolicismului, iezuiții au revenit în Principat și la Cluj, dar complexul existent în 1584 nu s-a mai dezvoltat. În 1603, cetățenii unitarieni, încurajați de apropierea armatei noului principe Moise Székely, au alungat garnizoana regală germană și au devastat mănăstirea iezuiților." },
+    { id: 6, x: 33.2, y: 63.8, name: "Capela Căianu", kind: "Capelă",
+      period: "1605–1670", today: "Calea Mănăștur nr. 9", lat: 46.7706, lng: 23.5868,
+      photos: ["04-fosta-manastire-manastur_poarta-acces.jpg"],
+      short: "Casă medievală cumpărată în 1605 de Barbara Szentpáli și dăruită iezuiților în 1626. Mănăstirea și colegiul iezuit au funcționat aici până în 1670.",
+      desc: "Clădirea de la actualul număr 9 de pe Calea Mănăștur are o istorie proprie: provine dintr-o casă medievală cumpărată în 1605 de Barbara Szentpáli, care a dăruit-o iezuiților în 1626. Alungat din oraș în 1603, ordinul revenise în zona Clujului în 1615, când a primit în posesie biserica Calvaria, aflată însă în ruină; din acest motiv, mănăstirea și colegiul iezuit au funcționat până în 1670 chiar în clădirea donată de Szentpáli." },
     { id: 7, x: 10.6, y: 34.4, name: "Moara de hârtie", kind: "Meșteșug / moară",
       period: "sec. XVIII", today: "Malul Someșului Mic", lat: 46.7745, lng: 23.5815,
       short: "Moara de hârtie funcționa pe malul Someșului Mic, în afara zidurilor, folosind forța apei.",
@@ -339,7 +355,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var mapEl = $("h-map"), stage = $("h-stage"), overlay = $("h-overlay");
-  var state = { sel: null, expanded: false, zoom: 1, panX: 0, panY: 0 };
+  var state = { sel: null, photo: 0, expanded: false, zoom: 1, panX: 0, panY: 0 };
   var drag = null;
   var markerEls = {}, chipEls = {};
   var lastFocus = null;
@@ -440,6 +456,7 @@
   function select(id) {
     if (state.sel == null) lastFocus = document.activeElement;
     state.sel = id;
+    state.photo = 0;
     state.expanded = false;
     render();
     scrollToMap();
@@ -452,6 +469,7 @@
   }
   function step(d) {
     state.sel = LOCS[(idx(state.sel) + d + LOCS.length) % LOCS.length].id;
+    state.photo = 0;
     state.expanded = false;
     render();
   }
@@ -485,11 +503,26 @@
   function renderPhoto(l) {
     var box = $("h-photo");
     box.textContent = "";
-    if (l.photo) {
-      var img = el("img");
-      img.src = IMG_BASE + l.photo;
+    var photos = l.photos || [];
+    if (photos.length) {
+      var img = el("img", "h-pimg");
+      img.src = PHOTO_BASE + photos[state.photo % photos.length];
       img.alt = l.name;
       box.appendChild(img);
+      if (photos.length > 1) {
+        var nav = el("div", "h-pnav");
+        var go = function (d) { state.photo = (state.photo + d + photos.length) % photos.length; render(); };
+        var pb = el("button", null, "‹"), nb = el("button", null, "›");
+        pb.type = nb.type = "button";
+        pb.setAttribute("aria-label", "Fotografia anterioară");
+        nb.setAttribute("aria-label", "Fotografia următoare");
+        pb.addEventListener("click", function () { go(-1); });
+        nb.addEventListener("click", function () { go(1); });
+        nav.appendChild(pb);
+        nav.appendChild(el("span", "h-pcount", (state.photo + 1) + " / " + photos.length));
+        nav.appendChild(nb);
+        box.appendChild(nav);
+      }
     } else {
       var ph = el("div", "h-ph");
       ph.appendChild(el("b", null, String(l.id)));
@@ -498,7 +531,7 @@
     }
   }
 
-  var shownId = null;
+  var shownId = null, shownPhoto = -1;
   function render() {
     stage.style.transform = "scale(" + state.zoom + ") translate(" + state.panX + "%," + state.panY + "%)";
     stage.classList.toggle("is-zoomed", state.zoom > 1);
@@ -518,7 +551,7 @@
     var cur = LOCS[idx(state.sel)];
     var prev = LOCS[(idx(state.sel) + LOCS.length - 1) % LOCS.length];
     var next = LOCS[(idx(state.sel) + 1) % LOCS.length];
-    if (shownId !== cur.id) { renderPhoto(cur); shownId = cur.id; }
+    if (shownId !== cur.id || shownPhoto !== state.photo) { renderPhoto(cur); shownId = cur.id; shownPhoto = state.photo; }
     $("h-id").textContent = cur.id;
     $("h-kind").textContent = cur.kind;
     $("h-name").textContent = cur.name;
