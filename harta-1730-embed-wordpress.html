@@ -1,0 +1,539 @@
+<!--
+  Harta Cluj 1730 — bloc pentru WordPress (Custom HTML).
+  GENERAT AUTOMAT din harta-1730.html — nu edita direct acest fișier;
+  modifică harta-1730.html și rulează `python sync-embed.py`.
+-->
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" />
+<style>
+/* =========================================================================
+   Harta Cluj 1730 — bloc autonom pentru WordPress (fără build, fără dependențe).
+   Totul e scopat sub #iezuiti-1730-wrap: nu afectează tema și rezistă stilurilor ei.
+   Design: design_handoff_harta_cluj_1730 (Cinzel + EB Garamond, paletă pergament).
+   ========================================================================= */
+
+#iezuiti-1730-wrap {
+  --c-bg-1: #2a2016;
+  --c-bg-2: #16110b;
+  --c-gold: #e5c68c;
+  --c-gold-hi: #f2c14e;
+  --c-bronze: #a8712c;
+  --c-red: #8c2f24;
+  --c-parch-1: #efe3c8;
+  --c-parch-2: #e6d7b7;
+  --c-ink: #2c2113;
+  --c-ink-2: #453521;
+  --c-ink-3: #5b4a2e;
+  --c-ink-4: #7a6440;
+
+  box-sizing: border-box;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #e8dcc4;
+  background: radial-gradient(ellipse at 50% 0%, var(--c-bg-1) 0%, var(--c-bg-2) 70%);
+  padding: 28px 24px 56px;
+  text-align: left;
+  line-height: 1.4;
+}
+#iezuiti-1730-wrap *, #iezuiti-1730-wrap *::before, #iezuiti-1730-wrap *::after { box-sizing: border-box; }
+
+/* Normalizare defensivă împotriva temelor WordPress (h1/h2/p/button/span). */
+#iezuiti-1730-wrap h1, #iezuiti-1730-wrap h2, #iezuiti-1730-wrap p,
+#iezuiti-1730-wrap span, #iezuiti-1730-wrap button, #iezuiti-1730-wrap a, #iezuiti-1730-wrap strong {
+  font-family: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  text-shadow: none;
+  line-height: inherit;
+}
+/* <img> din temă (chenare, margini, max-width) — harta și poza din modal. */
+#iezuiti-1730-wrap img {
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+  padding: 0 !important; margin: 0 !important; max-width: none !important; filter: none !important;
+}
+
+#iezuiti-1730-wrap .h-inner { max-width: 1480px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+/* ---------- Antet ---------- */
+#iezuiti-1730-wrap .h-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  border-bottom: 1px solid rgba(168, 113, 44, .35); padding-bottom: 12px;
+}
+#iezuiti-1730-wrap .h-titles { display: flex; flex-direction: column; gap: 4px; }
+#iezuiti-1730-wrap .h-title {
+  margin: 0; padding: 0; font-family: 'Cinzel', serif; font-weight: 600; font-size: 26px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--c-gold); line-height: 1.25;
+}
+#iezuiti-1730-wrap .h-sub { margin: 0; font-size: 17px; color: #b6a279; font-style: italic; }
+#iezuiti-1730-wrap .h-count { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: .22em; color: #8d7a55; }
+
+/* ---------- Harta ---------- */
+#iezuiti-1730-wrap .h-map {
+  position: relative; width: 100%; aspect-ratio: 2560 / 1706; overflow: hidden;
+  border: 1px solid rgba(168, 113, 44, .45); box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+  background: #1c150e; touch-action: pan-y;
+}
+#iezuiti-1730-wrap .h-stage {
+  position: absolute; inset: 0; transform-origin: center center;
+  transition: transform .25s ease-out;
+}
+#iezuiti-1730-wrap .h-stage.is-zoomed { cursor: grab; touch-action: none; }
+#iezuiti-1730-wrap .h-stage.is-dragging { transition: none; cursor: grabbing; }
+#iezuiti-1730-wrap .h-bg {
+  position: absolute; inset: 0; width: 100% !important; height: 100%; object-fit: cover; display: block;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* ---------- Markere ---------- */
+#iezuiti-1730-wrap .h-marker {
+  position: absolute; transform: translate(-50%, -50%); width: 46px; height: 46px; padding: 0; margin: 0;
+  border: 0 !important; background: transparent !important; box-shadow: none !important;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;
+  min-width: 0; min-height: 0;
+}
+#iezuiti-1730-wrap .h-marker:hover { filter: brightness(1.25); }
+#iezuiti-1730-wrap .h-marker:focus-visible { outline: 2px solid var(--c-gold-hi); outline-offset: 2px; border-radius: 999px; }
+#iezuiti-1730-wrap .h-dot {
+  width: 30px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-size: 15px; font-weight: 600; line-height: 1;
+  transition: background .2s, color .2s, box-shadow .2s;
+  background: #fff; color: #000; border: 2px solid rgba(28, 21, 14, .55); box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+}
+#iezuiti-1730-wrap .h-ring {
+  position: absolute; inset: -6px; border-radius: 999px; border: 2px solid var(--c-gold-hi);
+  pointer-events: none; display: none;
+}
+#iezuiti-1730-wrap .h-marker.is-on { z-index: 20; animation: hc-bob 1.9s ease-in-out infinite; }
+#iezuiti-1730-wrap .h-marker.is-on .h-dot {
+  background: var(--c-gold-hi); color: var(--c-ink); border-color: var(--c-red); box-shadow: 0 0 26px rgba(242, 193, 78, .9);
+}
+#iezuiti-1730-wrap .h-marker.is-on .h-ring { display: block; animation: hc-ring 1.9s ease-out infinite; }
+#iezuiti-1730-wrap .h-marker.is-on .h-ring + .h-ring { animation-delay: .95s; }
+@keyframes hc-ring { 0% { transform: scale(1); opacity: .85; } 100% { transform: scale(2.9); opacity: 0; } }
+@keyframes hc-bob { 0%, 100% { transform: translate(-50%, -50%) scale(1.18); } 50% { transform: translate(-50%, -50%) scale(1.3); } }
+@keyframes hc-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Controale zoom ---------- */
+#iezuiti-1730-wrap .h-zoom {
+  position: absolute; right: 14px; bottom: 14px; z-index: 30; display: flex; flex-direction: column; gap: 6px;
+  background: rgba(20, 15, 9, .72); border: 1px solid rgba(168, 113, 44, .5); border-radius: 10px; padding: 6px;
+  backdrop-filter: blur(4px);
+}
+#iezuiti-1730-wrap .h-zoom button {
+  width: 34px; height: 34px; min-width: 0; padding: 0; margin: 0; border: 0 !important; border-radius: 6px;
+  background: rgba(255, 255, 255, .08) !important; color: #f0dcae !important; font-size: 18px; cursor: pointer;
+  font-family: 'EB Garamond', serif; box-shadow: none !important; line-height: 1;
+}
+#iezuiti-1730-wrap .h-zoom button:hover { background: rgba(242, 193, 78, .25) !important; }
+#iezuiti-1730-wrap .h-zoom button.h-reset { font-size: 14px; }
+#iezuiti-1730-wrap .h-zoomlabel {
+  position: absolute; left: 14px; bottom: 14px; z-index: 30; font-size: 12px; letter-spacing: .05em; color: #cbb98d;
+  background: rgba(20, 15, 9, .6); border: 1px solid rgba(168, 113, 44, .4); border-radius: 999px; padding: 4px 10px;
+}
+
+/* ---------- Modal ---------- */
+#iezuiti-1730-wrap .h-overlay {
+  position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center;
+  padding: 3%; background: rgba(12, 9, 6, .72); backdrop-filter: blur(3px);
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+#iezuiti-1730-wrap .h-overlay.is-open { opacity: 1; pointer-events: auto; }
+#iezuiti-1730-wrap .h-card {
+  position: relative; width: min(980px, 100%); max-height: 100%; overflow: auto;
+  background: linear-gradient(180deg, var(--c-parch-1) 0%, var(--c-parch-2) 100%); color: var(--c-ink);
+  border: 1px solid var(--c-bronze); box-shadow: 0 24px 60px rgba(0, 0, 0, .45), inset 0 0 0 6px rgba(168, 113, 44, .18);
+  transform: translateY(24px) scale(.97); transition: transform .35s cubic-bezier(.2, .8, .3, 1);
+}
+#iezuiti-1730-wrap .h-overlay.is-open .h-card { transform: none; }
+#iezuiti-1730-wrap .h-x {
+  position: absolute; top: 14px; right: 14px; z-index: 2; width: 38px; height: 38px; min-width: 0; padding: 0; margin: 0;
+  border-radius: 999px; border: 1px solid rgba(44, 33, 19, .3) !important; background: rgba(255, 255, 255, .55) !important;
+  color: var(--c-ink) !important; font-size: 20px; line-height: 1; cursor: pointer; box-shadow: none !important;
+}
+#iezuiti-1730-wrap .h-x:hover { background: var(--c-ink) !important; color: var(--c-parch-1) !important; }
+#iezuiti-1730-wrap .h-grid { display: grid; grid-template-columns: 1.05fr 1fr; }
+#iezuiti-1730-wrap .h-photo {
+  position: relative; min-height: 380px; background: #d8c8a4; display: flex; align-items: center; justify-content: center;
+}
+#iezuiti-1730-wrap .h-photo img { position: absolute; inset: 0; width: 100% !important; height: 100%; object-fit: cover; }
+#iezuiti-1730-wrap .h-ph {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; text-align: center;
+  font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-ink-4);
+}
+#iezuiti-1730-wrap .h-ph b {
+  width: 72px; height: 72px; border-radius: 999px; border: 1px solid rgba(140, 47, 36, .5); color: var(--c-red);
+  display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 600; letter-spacing: 0;
+}
+#iezuiti-1730-wrap .h-body { padding: 40px 44px 36px; display: flex; flex-direction: column; gap: 16px; }
+#iezuiti-1730-wrap .h-kindrow { display: flex; align-items: center; gap: 12px; padding-right: 40px; }
+#iezuiti-1730-wrap .h-badge {
+  flex: none; width: 38px; height: 38px; border-radius: 999px; background: var(--c-red); color: #f6ecd6;
+  font-family: 'Cinzel', serif; font-size: 18px; display: flex; align-items: center; justify-content: center;
+}
+#iezuiti-1730-wrap .h-kind {
+  font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-ink-4);
+}
+#iezuiti-1730-wrap .h-name {
+  margin: 0; padding: 0; font-family: 'Cinzel', serif; font-weight: 600; font-size: 30px; line-height: 1.15;
+  color: var(--c-ink); text-transform: none; letter-spacing: normal;
+}
+#iezuiti-1730-wrap .h-desc {
+  margin: 0; font-size: 19px; line-height: 1.55; text-wrap: pretty; color: var(--c-ink-2);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+#iezuiti-1730-wrap .h-desc.is-open { -webkit-line-clamp: unset; display: block; }
+#iezuiti-1730-wrap .h-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+#iezuiti-1730-wrap .h-more {
+  padding: 9px 18px; margin: 0; border: 1px solid var(--c-bronze) !important; border-radius: 999px;
+  background: transparent !important; color: #7a4a1e !important; font-family: 'EB Garamond', serif; font-size: 16px;
+  cursor: pointer; box-shadow: none !important;
+}
+#iezuiti-1730-wrap .h-more:hover { background: rgba(168, 113, 44, .12) !important; }
+#iezuiti-1730-wrap .h-go {
+  padding: 9px 18px; border-radius: 999px; background: var(--c-red) !important; color: #f6ecd6 !important;
+  font-size: 16px; text-decoration: none !important; display: inline-flex; align-items: center; gap: 6px; border: 0;
+}
+#iezuiti-1730-wrap .h-go:hover { background: #a8382b !important; }
+#iezuiti-1730-wrap .h-meta {
+  margin-top: 4px; padding-top: 14px; border-top: 1px solid rgba(44, 33, 19, .2);
+  display: flex; flex-direction: column; gap: 6px; font-size: 16px; color: var(--c-ink-3);
+}
+#iezuiti-1730-wrap .h-meta strong { font-weight: 500; color: var(--c-ink); }
+#iezuiti-1730-wrap .h-nav { margin-top: auto; padding-top: 20px; display: flex; gap: 10px; }
+#iezuiti-1730-wrap .h-nav button {
+  flex: 1; min-width: 0; padding: 12px 16px; margin: 0; border: 1px solid rgba(44, 33, 19, .35) !important; border-radius: 0;
+  font-family: 'EB Garamond', serif; font-size: 17px; cursor: pointer; box-shadow: none !important;
+  background: transparent !important; color: var(--c-ink) !important;
+}
+#iezuiti-1730-wrap .h-nav button:hover { background: rgba(44, 33, 19, .08) !important; }
+#iezuiti-1730-wrap .h-nav .h-next { background: var(--c-ink) !important; color: var(--c-parch-1) !important; }
+#iezuiti-1730-wrap .h-nav .h-next:hover { background: var(--c-red) !important; }
+
+/* ---------- Pastile ---------- */
+#iezuiti-1730-wrap .h-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+#iezuiti-1730-wrap .h-chip {
+  padding: 7px 14px; margin: 0; border-radius: 999px; font-family: 'EB Garamond', serif; font-size: 16px; cursor: pointer;
+  transition: all .2s; box-shadow: none !important; line-height: 1.3;
+  background: transparent !important; color: #b6a279 !important; border: 1px solid rgba(168, 113, 44, .4) !important;
+}
+#iezuiti-1730-wrap .h-chip:hover { border-color: #c9973f !important; color: #f0dcae !important; }
+#iezuiti-1730-wrap .h-chip.is-on { background: var(--c-gold-hi) !important; color: var(--c-ink) !important; border-color: var(--c-gold-hi) !important; }
+
+/* ---------- Mobil ---------- */
+@media (max-width: 760px) {
+  #iezuiti-1730-wrap { padding: 18px 12px 36px; }
+  #iezuiti-1730-wrap .h-title { font-size: 19px; }
+  #iezuiti-1730-wrap .h-sub { font-size: 15px; }
+  #iezuiti-1730-wrap .h-grid { grid-template-columns: 1fr; }
+  #iezuiti-1730-wrap .h-photo { min-height: 140px; }
+  #iezuiti-1730-wrap .h-ph b { width: 48px; height: 48px; font-size: 22px; }
+  #iezuiti-1730-wrap .h-body { padding: 20px 20px 22px; gap: 12px; }
+  #iezuiti-1730-wrap .h-name { font-size: 22px; }
+  #iezuiti-1730-wrap .h-desc { font-size: 17px; }
+  /* Harta e prea mică pe telefon pentru un modal în interiorul ei: overlay pe tot ecranul. */
+  #iezuiti-1730-wrap .h-overlay { position: fixed; z-index: 99999; padding: 12px; }
+  #iezuiti-1730-wrap .h-card { max-height: 100%; }
+  #iezuiti-1730-wrap .h-photo:not(:has(img)) { display: none; }
+  #iezuiti-1730-wrap .h-nav { flex-direction: column; padding-top: 8px; }
+  #iezuiti-1730-wrap .h-nav button { font-size: 15px; padding: 10px 12px; }
+  #iezuiti-1730-wrap .h-marker { width: 38px; height: 38px; }
+  #iezuiti-1730-wrap .h-dot { width: 24px; height: 24px; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #iezuiti-1730-wrap .h-marker.is-on, #iezuiti-1730-wrap .h-marker.is-on .h-ring { animation: none; }
+  #iezuiti-1730-wrap .h-stage, #iezuiti-1730-wrap .h-card, #iezuiti-1730-wrap .h-overlay { transition: none; }
+}
+</style>
+
+<div id="iezuiti-1730-wrap">
+  <div class="h-inner">
+    <div class="h-head">
+      <div class="h-titles">
+        <h1 class="h-title">Cluj &middot; Clausenburg &middot; Kolozsvár</h1>
+        <p class="h-sub">Hartă interactivă a cetății, anul 1730 &mdash; alege o locație numerotată</p>
+      </div>
+      <span class="h-count" id="h-count"></span>
+    </div>
+
+    <div class="h-map" id="h-map">
+      <div class="h-stage" id="h-stage"></div>
+      <div class="h-zoom">
+        <button type="button" id="h-zin" aria-label="Zoom in">+</button>
+        <button type="button" id="h-zout" aria-label="Zoom out">&ndash;</button>
+        <button type="button" id="h-zreset" class="h-reset" aria-label="Resetează zoom">&#10226;</button>
+      </div>
+      <span class="h-zoomlabel" id="h-zlabel">100%</span>
+
+      <div class="h-overlay" id="h-overlay" role="dialog" aria-modal="true" aria-labelledby="h-name" aria-hidden="true">
+        <div class="h-card" id="h-card">
+          <button type="button" class="h-x" id="h-close" aria-label="Închide">&times;</button>
+          <div class="h-grid">
+            <div class="h-photo" id="h-photo"></div>
+            <div class="h-body">
+              <div class="h-kindrow"><span class="h-badge" id="h-id"></span><span class="h-kind" id="h-kind"></span></div>
+              <h2 class="h-name" id="h-name"></h2>
+              <p class="h-desc" id="h-desc"></p>
+              <div class="h-actions">
+                <button type="button" class="h-more" id="h-more">Află mai multe</button>
+                <a class="h-go" id="h-go" target="_blank" rel="noopener">&#128205; Du-mă la locație</a>
+              </div>
+              <div class="h-meta">
+                <span><strong>Perioadă:</strong> <span id="h-period"></span></span>
+                <span><strong>Astăzi:</strong> <span id="h-today"></span></span>
+              </div>
+              <div class="h-nav">
+                <button type="button" id="h-prev"></button>
+                <button type="button" class="h-next" id="h-next"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-chips" id="h-chips"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ATENȚIE: înlocuiește valoarea de mai jos cu URL-ul din Media Library WordPress
+  // unde ai încărcat imaginea hărții (cluj-map-1730.webp), păstrând "/" la final.
+  // Exemplu: "https://numelesitei.ro/wp-content/uploads/2026/08/"
+  var IMG_BASE = "content/harta-1730/";
+
+  // x, y = % pe imagine; lat/lng = destinația pentru Google Maps.
+  // Pozițiile pe hartă și coordonatele GPS sunt ESTIMATE — de verificat (vezi README-ul designului).
+  // photo (opțional): numele fișierului din IMG_BASE; fără el, modalul arată un placeholder.
+  var LOCS = [
+    { id: 1, x: 55.5, y: 38.3, name: "Biserica Sfânta Treime", kind: "Biserică",
+      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7712, lng: 23.5925,
+      short: "Biserica Sfânta Treime, reper de la 1730 în partea de nord-est a cetății. Turnul ei se vede printre acoperișurile cartierului.",
+      desc: "Biserica Sfânta Treime, reper de la 1730 în partea de nord-est a cetății. Turnul ei se vede printre acoperișurile cartierului." },
+    { id: 2, x: 58.5, y: 80.0, name: "Colegiul Societății lui Iisus (SJ)", kind: "Colegiu iezuit",
+      period: "sec. XVII–XVIII", today: "Zona Pieței Unirii – Str. Universității", lat: 46.7688, lng: 23.5892,
+      short: "Colegiul iezuit, alăturat bisericii iezuiților, a fost centrul învățământului superior din Cluj. Aici s-au format generații de elevi din Transilvania.",
+      desc: "Colegiul iezuit, alăturat bisericii iezuiților, a fost centrul învățământului superior din Cluj. Aici s-au format generații de elevi din Transilvania." },
+    { id: 3, x: 64.6, y: 67.0, name: "Convictul nobiliar", kind: "Internat",
+      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7696, lng: 23.5905,
+      short: "Convictul nobiliar găzduia și educa fiii nobilimii transilvănene, în legătură cu colegiul iezuit.",
+      desc: "Convictul nobiliar găzduia și educa fiii nobilimii transilvănene, în legătură cu colegiul iezuit." },
+    { id: 4, x: 72.2, y: 63.8, name: "Convictul pentru elevi săraci „Sf. Iosif”", kind: "Internat",
+      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7699, lng: 23.5918,
+      short: "Convictul „Sf. Iosif” oferea cazare și învățătură elevilor lipsiți de mijloace, completând rețeaua școlară iezuită.",
+      desc: "Convictul „Sf. Iosif” oferea cazare și învățătură elevilor lipsiți de mijloace, completând rețeaua școlară iezuită." },
+    { id: 5, x: 82.5, y: 70.7, name: "Biserica reformată Sf. Gheorghe (fosta franciscană și SJ)", kind: "Biserică și fost ansamblu monahal",
+      period: "sec. XV, refăcută în sec. XVIII", today: "Strada Mihail Kogălniceanu", lat: 46.7686, lng: 23.5916,
+      short: "Ansamblu monahal cu biserică gotică, aflat în colțul răsăritean al cetății. A trecut prin mai multe ordine călugărești, fiind unul dintre cele mai vechi lăcașuri ale orașului.",
+      desc: "Ansamblu monahal cu biserică gotică, aflat în colțul răsăritean al cetății. A trecut prin mai multe ordine călugărești de-a lungul secolelor, fiind unul dintre cele mai vechi lăcașuri ale orașului." },
+    { id: 6, x: 33.2, y: 63.8, name: "Capela Caianu", kind: "Capelă",
+      period: "sec. XVIII", today: "Centrul istoric", lat: 46.7706, lng: 23.5868,
+      short: "Capela Caianu, mică capelă legată de casa familiei Caianu, în vestul cetății.",
+      desc: "Capela Caianu, mică capelă legată de casa familiei Caianu, în vestul cetății." },
+    { id: 7, x: 10.6, y: 34.4, name: "Moara de hârtie", kind: "Meșteșug / moară",
+      period: "sec. XVIII", today: "Malul Someșului Mic", lat: 46.7745, lng: 23.5815,
+      short: "Moara de hârtie funcționa pe malul Someșului Mic, în afara zidurilor, folosind forța apei.",
+      desc: "Moara de hârtie funcționa pe malul Someșului Mic, în afara zidurilor, folosind forța apei." }
+  ];
+
+  var MIN_ZOOM = 1, MAX_ZOOM = 4;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var mapEl = $("h-map"), stage = $("h-stage"), overlay = $("h-overlay");
+  var state = { sel: null, expanded: false, zoom: 1, panX: 0, panY: 0 };
+  var drag = null;
+  var markerEls = {}, chipEls = {};
+  var lastFocus = null;
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  // ---------- Construire ----------
+  $("h-count").textContent = LOCS.length + " LOCAȚII";
+
+  var bg = el("img", "h-bg");
+  bg.src = IMG_BASE + "cluj-map-1730.webp";
+  bg.alt = "Harta Clujului la 1730";
+  bg.draggable = false;
+  stage.appendChild(bg);
+
+  LOCS.forEach(function (l) {
+    var b = el("button", "h-marker");
+    b.type = "button";
+    b.title = l.name;
+    b.setAttribute("aria-label", l.id + ". " + l.name);
+    b.style.left = l.x + "%";
+    b.style.top = l.y + "%";
+    b.appendChild(el("span", "h-ring"));
+    b.appendChild(el("span", "h-ring"));
+    b.appendChild(el("span", "h-dot", String(l.id)));
+    b.addEventListener("click", function () { if (!suppressClick) select(l.id); });
+    stage.appendChild(b);
+    markerEls[l.id] = b;
+
+    var c = el("button", "h-chip", l.id + ". " + l.name);
+    c.type = "button";
+    c.addEventListener("click", function () { select(l.id); });
+    $("h-chips").appendChild(c);
+    chipEls[l.id] = c;
+  });
+
+  // ---------- Zoom / pan ----------
+  // translate() vine DUPĂ scale() în transform, deci e scalat: limita în unități de pan e (zoom−1)*50/zoom.
+  function panLimit(z) { return (z - 1) * 50 / z; }
+  function clampPan() {
+    var m = panLimit(state.zoom);
+    state.panX = Math.max(-m, Math.min(m, state.panX));
+    state.panY = Math.max(-m, Math.min(m, state.panY));
+  }
+  function setZoom(z) {
+    state.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
+    clampPan();
+    render();
+  }
+
+  mapEl.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    setZoom(state.zoom + (-e.deltaY * 0.0018) * state.zoom);
+  }, { passive: false });
+
+  mapEl.addEventListener("dblclick", function (e) {
+    if (overlay.contains(e.target) || e.target.closest(".h-zoom")) return;
+    setZoom(state.zoom > 1.4 ? 1 : 2.2);
+  });
+
+  var suppressClick = false;
+  stage.addEventListener("pointerdown", function (e) {
+    if (state.zoom <= 1 || (e.pointerType === "mouse" && e.button !== 0)) return;
+    drag = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY, moved: false, id: e.pointerId };
+  });
+  window.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
+    if (!drag.moved) { drag.moved = true; stage.classList.add("is-dragging"); }
+    // 1:1 cu degetul: % din dimensiunea stage-ului, împărțit la zoom (translate e scalat).
+    state.panX = drag.panX + (dx / stage.offsetWidth) * 100 / state.zoom;
+    state.panY = drag.panY + (dy / stage.offsetHeight) * 100 / state.zoom;
+    clampPan();
+    render();
+  });
+  function endDrag() {
+    if (!drag) return;
+    if (drag.moved) { suppressClick = true; setTimeout(function () { suppressClick = false; }, 0); }
+    drag = null;
+    stage.classList.remove("is-dragging");
+  }
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
+
+  $("h-zin").addEventListener("click", function () { setZoom(state.zoom + 0.5); });
+  $("h-zout").addEventListener("click", function () { setZoom(state.zoom - 0.5); });
+  $("h-zreset").addEventListener("click", function () { state.zoom = 1; state.panX = 0; state.panY = 0; render(); });
+
+  // ---------- Selecție / modal ----------
+  function idx(id) { for (var i = 0; i < LOCS.length; i++) if (LOCS[i].id === id) return i; return -1; }
+
+  function select(id) {
+    if (state.sel == null) lastFocus = document.activeElement;
+    state.sel = id;
+    state.expanded = false;
+    render();
+    scrollToMap();
+  }
+  function close() {
+    if (state.sel == null) return;
+    state.sel = null;
+    render();
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+  function step(d) {
+    state.sel = LOCS[(idx(state.sel) + d + LOCS.length) % LOCS.length].id;
+    state.expanded = false;
+    render();
+  }
+
+  // Derulează la hartă după ce layout-ul s-a stabilizat (pastilele sunt sub hartă).
+  var scrollGen = 0;
+  function scrollToMap() {
+    var gen = ++scrollGen, last = -1, stable = 0;
+    function go(behavior) {
+      var r = mapEl.getBoundingClientRect();
+      window.scrollTo({ top: r.top + window.pageYOffset - 24, behavior: behavior });
+    }
+    (function tick() {
+      if (gen !== scrollGen) return;
+      var h = mapEl.getBoundingClientRect().height;
+      stable = Math.abs(h - last) < 1 ? stable + 1 : 0;
+      last = h;
+      if (stable >= 4) { go("smooth"); return; }
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
+  $("h-close").addEventListener("click", close);
+  $("h-more").addEventListener("click", function () { state.expanded = !state.expanded; render(); });
+  $("h-prev").addEventListener("click", function () { step(-1); });
+  $("h-next").addEventListener("click", function () { step(1); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+
+  // ---------- Randare ----------
+  function renderPhoto(l) {
+    var box = $("h-photo");
+    box.textContent = "";
+    if (l.photo) {
+      var img = el("img");
+      img.src = IMG_BASE + l.photo;
+      img.alt = l.name;
+      box.appendChild(img);
+    } else {
+      var ph = el("div", "h-ph");
+      ph.appendChild(el("b", null, String(l.id)));
+      ph.appendChild(el("span", null, "Fotografie în curând"));
+      box.appendChild(ph);
+    }
+  }
+
+  var shownId = null;
+  function render() {
+    stage.style.transform = "scale(" + state.zoom + ") translate(" + state.panX + "%," + state.panY + "%)";
+    stage.classList.toggle("is-zoomed", state.zoom > 1);
+    $("h-zlabel").textContent = Math.round(state.zoom * 100) + "%";
+
+    LOCS.forEach(function (l) {
+      var on = l.id === state.sel;
+      markerEls[l.id].classList.toggle("is-on", on);
+      chipEls[l.id].classList.toggle("is-on", on);
+    });
+
+    var open = state.sel != null;
+    overlay.classList.toggle("is-open", open);
+    overlay.setAttribute("aria-hidden", open ? "false" : "true");
+    if (!open) return;
+
+    var cur = LOCS[idx(state.sel)];
+    var prev = LOCS[(idx(state.sel) + LOCS.length - 1) % LOCS.length];
+    var next = LOCS[(idx(state.sel) + 1) % LOCS.length];
+    if (shownId !== cur.id) { renderPhoto(cur); shownId = cur.id; }
+    $("h-id").textContent = cur.id;
+    $("h-kind").textContent = cur.kind;
+    $("h-name").textContent = cur.name;
+    $("h-desc").textContent = state.expanded ? cur.desc : cur.short;
+    $("h-desc").classList.toggle("is-open", state.expanded);
+    $("h-more").textContent = state.expanded ? "Arată mai puțin" : "Află mai multe";
+    $("h-period").textContent = cur.period;
+    $("h-today").textContent = cur.today;
+    $("h-go").href = "https://www.google.com/maps/dir/?api=1&destination=" + cur.lat + "," + cur.lng + "&travelmode=driving";
+    $("h-prev").textContent = "← " + prev.name;
+    $("h-next").textContent = next.name + " →";
+  }
+
+  render();
+})();
+</script>

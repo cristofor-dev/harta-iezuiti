@@ -27,9 +27,12 @@ harta-iezuiti/
 ├── instructiuni-wordpress.md      # pași deploy: upload poze, integrare Custom HTML block
 ├── harta.html                     # SURSA DE ADEVĂR — pagină completă, previzualizare locală
 ├── harta-embed-wordpress.html     # GENERAT din harta.html — codul de lipit în WordPress
-├── sync-embed.py                  # regenerează embed-ul din harta.html
+├── sync-embed.py                  # regenerează ambele embed-uri din sursele lor
+├── harta-1730.html                # SURSA a hărții istorice Cluj 1730 (imagine + zoom/pan, 7 locații, modal)
+├── harta-1730-embed-wordpress.html # GENERAT din harta-1730.html
 └── content/
     ├── Prezenta_Iezuitilor_Cluj-Napoca_1.md    # text sursă pentru popup-uri (convertit din PDF-ul original, șters după conversie)
+    ├── harta-1730/cluj-map-1730.webp           # harta 1730, comprimată (WebP q82, 2560×1706, ~870 KB)
     └── photo/                                   # 8 fotografii de arhivă (Fortepan, Wikimedia)
 ```
 
@@ -73,3 +76,17 @@ harta-iezuiti/
   - `h2/h3/p` preiau `text-transform`, fonturi și `line-height` de la temă — de aici blocul
     de normalizare defensivă.
 - Limba conținutului: doar română (decizie explicită, vezi planificarea).
+
+## Harta Cluj 1730 (`harta-1730.html`)
+
+Pagină separată, independentă de harta Leaflet; implementează `design_handoff_harta_cluj_1730`
+(Cinzel + EB Garamond, paletă pergament). Vanilla JS, fără build, scopată sub `#iezuiti-1730-wrap`.
+Același flux ca la prima hartă: editezi `harta-1730.html`, rulezi `python sync-embed.py`; în WordPress
+se înlocuiește `IMG_BASE` cu URL-ul din Media Library (încarcă `cluj-map-1730.webp`).
+
+- Pozițiile (x, y în %) și coordonatele GPS ale celor 7 locații sunt **estimate**, din handoff — de verificat.
+- Textele sunt provizorii. Imaginile locațiilor lipsesc: câmpul opțional `photo` din `LOCS` (fișier în
+  `IMG_BASE`); fără el, modalul arată un placeholder.
+- Pan/zoom: limita de pan e `(zoom−1)*50/zoom` (translate vine după scale), nu `(zoom−1)*50` ca în
+  prototip, altfel apar margini goale; drag-ul e 1:1 cu degetul.
+- Sub 760px modalul e `position: fixed` pe tot ecranul — harta e prea mică pe telefon pentru un modal în ea.
