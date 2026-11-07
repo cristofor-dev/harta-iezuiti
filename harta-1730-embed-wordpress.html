@@ -184,6 +184,11 @@
   transform: translateY(24px) scale(.97); transition: transform .35s cubic-bezier(.2, .8, .3, 1);
 }
 #iezuiti-1730-wrap .h-overlay.is-open .h-card { transform: none; }
+/* Expandat pe desktop: înălțimea e fixată din JS (cea din starea restrânsă); derulează doar textul. */
+#iezuiti-1730-wrap .h-card.is-expanded { box-sizing: border-box; overflow: hidden; }
+#iezuiti-1730-wrap .h-card.is-expanded .h-grid { height: 100%; grid-template-rows: minmax(0, 1fr); }
+#iezuiti-1730-wrap .h-card.is-expanded .h-body { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+#iezuiti-1730-wrap .h-card.is-expanded .h-body > * { flex-shrink: 0; }
 #iezuiti-1730-wrap .h-x {
   position: absolute; top: 14px; right: 14px; z-index: 2; width: 38px; height: 38px; min-width: 0; padding: 0; margin: 0;
   border-radius: 999px; border: 1px solid rgba(44, 33, 19, .3) !important; background: rgba(255, 255, 255, .55) !important;
@@ -600,16 +605,32 @@
   // sau un text identic care nu încape în cele 3 rânduri. Măsurat din layout, deci ține cont de lățime.
   // Fără scroll în modal (pe desktop): dacă tot conținutul nu încape în card, corpul se micșorează treptat
   // (CSS zoom) până încape — cu o limită, ca textul să rămână lizibil. Expandat = scroll permis (text lung).
+  // Expandat (desktop): cardul își păstrează dimensiunea din starea restrânsă — același zoom al textului
+  // și aceeași înălțime, deci poza nu se mărește și literele nu cresc — iar doar coloana de text derulează.
   var body = document.querySelector(".h-body"), card = $("h-card");
+  var fitZoom = 1, fitHeight = 0;
   function fitCard() {
     if (!body.style) return;
+    var desktop = !window.matchMedia("(max-width: 760px)").matches;
+    var lock = state.sel != null && state.expanded && desktop && fitHeight > 0;
+    var wasLocked = card.classList.contains("is-expanded");
+    card.classList.toggle("is-expanded", lock);
+    if (lock) {
+      if (!wasLocked) body.scrollTop = 0; // textul expandat începe de sus, nu de unde a rămas alt loc
+      body.style.zoom = fitZoom === 1 ? "" : fitZoom;
+      card.style.height = fitHeight + "px";
+      return;
+    }
+    card.style.height = "";
     body.style.zoom = "";
-    if (state.sel == null || state.expanded || window.matchMedia("(max-width: 760px)").matches) return;
+    if (state.sel == null || state.expanded || !desktop) return;
     var z = 1;
     while (card.scrollHeight > card.clientHeight + 1 && z > 0.64) {
       z = Math.round((z - 0.03) * 100) / 100;
       body.style.zoom = z;
     }
+    fitZoom = z;
+    fitHeight = card.offsetHeight;
   }
 
   function updateMore(cur) {
